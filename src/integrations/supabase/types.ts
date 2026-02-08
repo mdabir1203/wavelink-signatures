@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      contracts: {
+        Row: {
+          access_token: string
+          ambassador_email: string | null
+          ambassador_gov_id: string | null
+          ambassador_name: string | null
+          ambassador_organization: string | null
+          ambassador_signature_data: string | null
+          ambassador_signed_at: string | null
+          ambassador_tax_id: string | null
+          ambassador_title: string | null
+          company_email: string
+          company_name: string
+          company_organization: string
+          company_signature_data: string | null
+          company_signed_at: string | null
+          company_title: string
+          contract_id: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          status: Database["public"]["Enums"]["contract_status"]
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          access_token?: string
+          ambassador_email?: string | null
+          ambassador_gov_id?: string | null
+          ambassador_name?: string | null
+          ambassador_organization?: string | null
+          ambassador_signature_data?: string | null
+          ambassador_signed_at?: string | null
+          ambassador_tax_id?: string | null
+          ambassador_title?: string | null
+          company_email?: string
+          company_name?: string
+          company_organization?: string
+          company_signature_data?: string | null
+          company_signed_at?: string | null
+          company_title?: string
+          contract_id: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          status?: Database["public"]["Enums"]["contract_status"]
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          access_token?: string
+          ambassador_email?: string | null
+          ambassador_gov_id?: string | null
+          ambassador_name?: string | null
+          ambassador_organization?: string | null
+          ambassador_signature_data?: string | null
+          ambassador_signed_at?: string | null
+          ambassador_tax_id?: string | null
+          ambassador_title?: string | null
+          company_email?: string
+          company_name?: string
+          company_organization?: string
+          company_signature_data?: string | null
+          company_signed_at?: string | null
+          company_title?: string
+          contract_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          status?: Database["public"]["Enums"]["contract_status"]
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +97,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      contract_status: "draft" | "pending" | "signed" | "terminated"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +224,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      contract_status: ["draft", "pending", "signed", "terminated"],
+    },
   },
 } as const
