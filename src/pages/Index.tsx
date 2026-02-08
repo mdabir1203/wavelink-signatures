@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
-import { motion } from "framer-motion";
-import { Download, Send, Eye, PenLine, RotateCcw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2 } from "lucide-react";
 import ContractHeader from "@/components/ContractHeader";
 import ContractDocument from "@/components/ContractDocument";
 import ContractStatusBar from "@/components/ContractStatusBar";
@@ -9,6 +9,7 @@ import SignerForm from "@/components/SignerForm";
 import SignedStamp from "@/components/SignedStamp";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { createContract } from "@/lib/contracts";
 
 interface SignerInfo {
   name: string;
@@ -50,6 +51,9 @@ const Index = () => {
   const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
   const [companySigned] = useState(true);
   const [showStamp, setShowStamp] = useState(false);
+  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -76,7 +80,8 @@ const Index = () => {
     );
   };
 
-  const handleSign = () => {
+  // Local signing (for preview purposes)
+  const handleLocalSign = () => {
     if (!isFormValid()) {
       toast({
         title: "Missing Information",
@@ -97,11 +102,53 @@ const Index = () => {
     }, 2000);
   };
 
+  // Send to ambassador: creates contract in DB and generates shareable link
+  const handleSendForSigning = async () => {
+    setSending(true);
+    try {
+      const result = await createContract({
+        contract_id: contractId,
+        company_name: companyInfo.name,
+        company_email: companyInfo.email,
+        company_title: companyInfo.title,
+        company_organization: companyInfo.organization,
+      });
+
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/sign/${result.contract.access_token}`;
+      setShareLink(link);
+      setStatus("pending");
+
+      toast({
+        title: "Contract Created & Ready to Share",
+        description: "Copy the signing link below and send it to your ambassador.",
+      });
+    } catch (err: any) {
+      toast({
+        title: "Error Creating Contract",
+        description: err.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (!shareLink) return;
+    navigator.clipboard.writeText(shareLink);
+    setCopied(true);
+    toast({ title: "Link Copied!", description: "Signing link copied to clipboard." });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const handleReset = () => {
     setStatus("draft");
     setShowStamp(false);
     setAmbassadorInfo(initialSigner);
     setAmbassadorSignature(null);
+    setShareLink(null);
+    setCopied(false);
   };
 
   return (
@@ -120,7 +167,7 @@ const Index = () => {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {status === "signed" && (
+            {(status === "signed" || shareLink) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -143,6 +190,52 @@ const Index = () => {
         </div>
       </motion.header>
 
+      {/* Share link banner */}
+      <AnimatePresence>
+        {shareLink && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-accent border-b border-border"
+          >
+            <div className="max-w-5xl mx-auto px-6 py-4">
+              <div className="flex items-center gap-3">
+                <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-body font-semibold text-foreground mb-1">
+                    Signing Link Ready — Send this to your ambassador
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs font-mono text-muted-foreground bg-card px-3 py-1.5 rounded-md border border-border truncate block flex-1">
+                      {shareLink}
+                    </code>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyLink}
+                      className="flex-shrink-0 text-xs font-body"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 mr-1" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 mr-1" />
+                          Copy Link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Status bar */}
       <div className="max-w-5xl mx-auto px-6 pt-6">
         <ContractStatusBar
@@ -161,7 +254,6 @@ const Index = () => {
             transition={{ delay: 0.1 }}
             className="bg-card rounded-xl document-shadow border border-border overflow-hidden"
           >
-            {/* Document content */}
             <div className="watermark relative p-10 md:p-14">
               <div className="relative z-10">
                 <ContractHeader
@@ -199,7 +291,7 @@ const Index = () => {
                           Wave Link Team
                         </p>
                         <p className="text-[10px] font-mono text-document-muted mt-1">
-                          {currentDate} • IP: 192.168.***
+                          {currentDate} • Verified
                         </p>
                       </div>
                     </div>
@@ -209,49 +301,58 @@ const Index = () => {
                       <SignerForm
                         signer={ambassadorInfo}
                         onChange={handleAmbassadorChange}
-                        disabled={status === "signed"}
+                        disabled={status === "signed" || !!shareLink}
                         label="Ambassador"
                         showKyc={true}
                       />
                       <SignaturePad
                         onSignatureChange={setAmbassadorSignature}
-                        disabled={status === "signed"}
+                        disabled={status === "signed" || !!shareLink}
                       />
                     </div>
                   </div>
 
-                  {/* Sign button */}
-                  {status !== "signed" && (
+                  {/* Action buttons */}
+                  {status === "draft" && !shareLink && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="mt-8 flex justify-center"
+                      className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
                     >
                       <Button
-                        onClick={handleSign}
-                        disabled={status === "pending"}
+                        onClick={handleSendForSigning}
+                        disabled={sending}
                         size="lg"
-                        className="px-10 font-body font-semibold tracking-wide"
+                        className="px-8 font-body font-semibold tracking-wide"
                       >
-                        {status === "pending" ? (
+                        {sending ? (
                           <>
                             <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
-                            Processing...
+                            Creating Contract...
                           </>
                         ) : (
                           <>
-                            <PenLine className="w-4 h-4 mr-2" />
-                            Sign & Execute Agreement
+                            <Send className="w-4 h-4 mr-2" />
+                            Send for Signing
                           </>
                         )}
+                      </Button>
+                      <span className="text-xs text-muted-foreground font-body">or</span>
+                      <Button
+                        onClick={handleLocalSign}
+                        variant="outline"
+                        size="lg"
+                        className="px-8 font-body font-semibold tracking-wide"
+                      >
+                        <PenLine className="w-4 h-4 mr-2" />
+                        Sign Locally
                       </Button>
                     </motion.div>
                   )}
                 </div>
               </div>
 
-              {/* Signed stamp overlay */}
               <SignedStamp
                 show={showStamp}
                 signerName={ambassadorInfo.name || "Ambassador"}
