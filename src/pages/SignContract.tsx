@@ -50,19 +50,20 @@ const SignContract = () => {
 
     getContract(token)
       .then((res) => {
-        setContract(res.contract);
-        if (res.contract.status === "signed") {
+        const c = res.contract as any;
+        setContract(c);
+        if (c.status === "signed") {
           setStatus("signed");
           setShowStamp(true);
           setAmbassadorInfo({
-            name: res.contract.ambassador_name || "",
-            email: res.contract.ambassador_email || "",
-            title: res.contract.ambassador_title || "",
-            organization: res.contract.ambassador_organization || "",
+            name: c.ambassador_name || "",
+            email: c.ambassador_email || "",
+            title: c.ambassador_title || "",
+            organization: c.ambassador_organization || "",
           });
         }
       })
-      .catch((err) => setError(err.message))
+      .catch((err: any) => setError(err.message))
       .finally(() => setLoading(false));
   }, [token]);
 

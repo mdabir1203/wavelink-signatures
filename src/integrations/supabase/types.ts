@@ -91,7 +91,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      contracts_public: {
+        Row: {
+          access_token: string | null
+          ambassador_email: string | null
+          ambassador_name: string | null
+          ambassador_organization: string | null
+          ambassador_signed_at: string | null
+          ambassador_title: string | null
+          company_email: string | null
+          company_name: string | null
+          company_organization: string | null
+          company_signed_at: string | null
+          company_title: string | null
+          contract_id: string | null
+          created_at: string | null
+          id: string | null
+          status: Database["public"]["Enums"]["contract_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          ambassador_email?: string | null
+          ambassador_name?: string | null
+          ambassador_organization?: string | null
+          ambassador_signed_at?: string | null
+          ambassador_title?: string | null
+          company_email?: string | null
+          company_name?: string | null
+          company_organization?: string | null
+          company_signed_at?: string | null
+          company_title?: string | null
+          contract_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          status?: Database["public"]["Enums"]["contract_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          ambassador_email?: string | null
+          ambassador_name?: string | null
+          ambassador_organization?: string | null
+          ambassador_signed_at?: string | null
+          ambassador_title?: string | null
+          company_email?: string | null
+          company_name?: string | null
+          company_organization?: string | null
+          company_signed_at?: string | null
+          company_title?: string | null
+          contract_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          status?: Database["public"]["Enums"]["contract_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
