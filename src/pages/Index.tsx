@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2 } from "lucide-react";
+import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2, Loader2 } from "lucide-react";
 import ContractHeader from "@/components/ContractHeader";
 import ContractDocument from "@/components/ContractDocument";
 import ContractStatusBar from "@/components/ContractStatusBar";
@@ -10,6 +10,7 @@ import SignedStamp from "@/components/SignedStamp";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { createContract } from "@/lib/contracts";
+import { useExportPdf } from "@/hooks/useExportPdf";
 
 interface SignerInfo {
   name: string;
@@ -40,6 +41,7 @@ const generateContractId = () => {
 
 const Index = () => {
   const [contractId] = useState(generateContractId());
+  const { exportPdf, exporting } = useExportPdf();
   const [status, setStatus] = useState<"draft" | "pending" | "signed">("draft");
   const [ambassadorInfo, setAmbassadorInfo] = useState<SignerInfo>(initialSigner);
   const [companyInfo] = useState<SignerInfo>({
@@ -182,9 +184,34 @@ const Index = () => {
               <Eye className="w-3.5 h-3.5 mr-1.5" />
               Preview
             </Button>
-            <Button variant="ghost" size="sm" className="text-xs font-body">
-              <Download className="w-3.5 h-3.5 mr-1.5" />
-              Export PDF
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-body"
+              disabled={exporting}
+              onClick={() => {
+                exportPdf({
+                  contractId,
+                  date: currentDate,
+                  status,
+                  companyInfo,
+                  ambassadorInfo,
+                  ambassadorSignatureData: ambassadorSignature,
+                  companySignedDate: currentDate,
+                  ambassadorSignedDate: status === "signed" ? currentDate : undefined,
+                }).then(() => {
+                  toast({ title: "PDF Exported", description: "Your contract has been downloaded." });
+                }).catch(() => {
+                  toast({ title: "Export Failed", description: "Could not generate PDF. Please try again.", variant: "destructive" });
+                });
+              }}
+            >
+              {exporting ? (
+                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+              ) : (
+                <Download className="w-3.5 h-3.5 mr-1.5" />
+              )}
+              {exporting ? "Generating..." : "Export PDF"}
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { PenLine, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { PenLine, CheckCircle2, AlertCircle, Loader2, Download } from "lucide-react";
 import ContractHeader from "@/components/ContractHeader";
 import ContractDocument from "@/components/ContractDocument";
 import ContractStatusBar from "@/components/ContractStatusBar";
@@ -11,6 +11,7 @@ import SignedStamp from "@/components/SignedStamp";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { getContract, signContract } from "@/lib/contracts";
+import { useExportPdf } from "@/hooks/useExportPdf";
 
 interface SignerInfo {
   name: string;
@@ -40,6 +41,7 @@ const SignContract = () => {
   const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
   const [showStamp, setShowStamp] = useState(false);
   const [signing, setSigning] = useState(false);
+  const { exportPdf, exporting } = useExportPdf();
 
   useEffect(() => {
     if (!token) {
@@ -176,12 +178,58 @@ const SignContract = () => {
               Wave Link — Sign Agreement
             </span>
           </div>
-          {status === "signed" && (
-            <div className="flex items-center gap-1.5 text-xs font-body text-status-signed">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Signed & Executed
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {status === "signed" && (
+              <div className="flex items-center gap-1.5 text-xs font-body text-status-signed">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Signed & Executed
+              </div>
+            )}
+            {contract && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs font-body"
+                disabled={exporting}
+                onClick={() => {
+                  const companyInfo = {
+                    name: contract.company_name || "Wave Link Team",
+                    email: contract.company_email || "",
+                    title: contract.company_title || "",
+                    organization: contract.company_organization || "",
+                  };
+                  const contractDate = contract.created_at
+                    ? new Date(contract.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                    : currentDate;
+                  exportPdf({
+                    contractId: contract.contract_id,
+                    date: contractDate,
+                    status,
+                    companyInfo,
+                    ambassadorInfo,
+                    ambassadorSignatureData: ambassadorSignature,
+                    companySignedDate: contract.company_signed_at
+                      ? new Date(contract.company_signed_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                      : undefined,
+                    ambassadorSignedDate: contract.ambassador_signed_at
+                      ? new Date(contract.ambassador_signed_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                      : undefined,
+                  }).then(() => {
+                    toast({ title: "PDF Exported", description: "Your contract has been downloaded." });
+                  }).catch(() => {
+                    toast({ title: "Export Failed", description: "Could not generate PDF.", variant: "destructive" });
+                  });
+                }}
+              >
+                {exporting ? (
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                ) : (
+                  <Download className="w-3.5 h-3.5 mr-1.5" />
+                )}
+                {exporting ? "Generating..." : "Export PDF"}
+              </Button>
+            )}
+          </div>
         </div>
       </motion.header>
 
