@@ -37,15 +37,15 @@ const ContractHeader: React.FC<ContractHeaderProps> = ({ contractId, status, dat
         <div className="flex items-center gap-4">
           <img
             src={wavelinkLogo}
-            alt="Wavelink"
-            className="w-14 h-14 rounded-lg object-cover"
+            alt="Wave Link"
+            className="w-16 h-16 object-contain"
           />
           <div>
             <h1 className="text-2xl font-display font-bold text-document-header tracking-tight">
-              WAVELINK
+              Wave Link
             </h1>
-            <p className="text-xs font-body text-document-muted tracking-[0.2em] uppercase mt-0.5">
-              Sustainability Solutions
+            <p className="text-xs font-body text-document-muted tracking-[0.15em] uppercase mt-0.5">
+              Smart Digital Solutions
             </p>
           </div>
         </div>
