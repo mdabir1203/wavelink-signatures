@@ -1,7 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 
-const FUNCTIONS_URL = `https://jesymicnypefgscytugp.supabase.co/functions/v1`;
-
 interface CreateContractPayload {
   contract_id: string;
   company_name?: string;
@@ -22,53 +20,86 @@ interface SignContractPayload {
 }
 
 export async function createContract(payload: CreateContractPayload) {
-  const response = await fetch(`${FUNCTIONS_URL}/contracts?action=create`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    },
-    body: JSON.stringify(payload),
-  });
+  const { data, error } = await supabase
+    .from("contracts")
+    .insert({
+      contract_id: payload.contract_id,
+      status: "pending" as any,
+      company_name: payload.company_name || "Wave Link",
+      company_email: payload.company_email || "waavelink@gmail.com",
+      company_title: payload.company_title || "Partnerships & Sustainability",
+      company_organization: payload.company_organization || "Wave Link",
+      company_signed_at: new Date().toISOString(),
+      company_signature_data: "Wave Link Team",
+    })
+    .select("id, contract_id, access_token")
+    .single();
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Failed to create contract");
+  if (error) {
+    throw new Error(error.message || "Failed to create contract");
   }
-  return data;
+
+  return { success: true, contract: data };
 }
 
 export async function getContract(accessToken: string) {
-  const response = await fetch(
-    `${FUNCTIONS_URL}/contracts?action=get&token=${encodeURIComponent(accessToken)}`,
-    {
-      method: "GET",
-      headers: {
-        "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-      },
-    }
-  );
+  // Use the public view which hides sensitive KYC fields
+  const { data, error } = await supabase
+    .from("contracts_public" as any)
+    .select("*")
+    .eq("access_token", accessToken)
+    .maybeSingle();
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Failed to fetch contract");
+  if (error) {
+    throw new Error(error.message || "Failed to fetch contract");
   }
-  return data;
+
+  if (!data) {
+    throw new Error("Contract not found");
+  }
+
+  return { success: true, contract: data };
 }
 
 export async function signContract(payload: SignContractPayload) {
-  const response = await fetch(`${FUNCTIONS_URL}/contracts?action=sign`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    },
-    body: JSON.stringify(payload),
-  });
+  // First verify the contract exists and is pending
+  const { data: existing, error: fetchError } = await supabase
+    .from("contracts_public" as any)
+    .select("id, status")
+    .eq("access_token", payload.access_token)
+    .maybeSingle();
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Failed to sign contract");
+  if (fetchError || !existing) {
+    throw new Error("Contract not found");
   }
-  return data;
+
+  if ((existing as any).status === "signed") {
+    throw new Error("Contract has already been signed");
+  }
+
+  // Update the contract with ambassador details
+  const { data, error } = await supabase
+    .from("contracts")
+    .update({
+      status: "signed" as any,
+      ambassador_name: payload.ambassador_name,
+      ambassador_email: payload.ambassador_email,
+      ambassador_title: payload.ambassador_title,
+      ambassador_organization: payload.ambassador_organization,
+      ambassador_gov_id: payload.ambassador_gov_id,
+      ambassador_tax_id: payload.ambassador_tax_id,
+      ambassador_signature_data: payload.ambassador_signature_data,
+      ambassador_signed_at: new Date().toISOString(),
+      ip_address: "client",
+      user_agent: navigator.userAgent,
+    } as any)
+    .eq("access_token", payload.access_token)
+    .select("id, contract_id, status, ambassador_signed_at")
+    .single();
+
+  if (error) {
+    throw new Error(error.message || "Failed to sign contract");
+  }
+
+  return { success: true, contract: data };
 }
