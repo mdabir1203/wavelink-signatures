@@ -38,10 +38,10 @@ const Index = () => {
   const [status, setStatus] = useState<"draft" | "pending" | "signed">("draft");
   const [ambassadorInfo, setAmbassadorInfo] = useState<SignerInfo>(initialSigner);
   const [companyInfo] = useState<SignerInfo>({
-    name: "Sarah Chen",
-    email: "sarah.chen@wavelink.com",
-    title: "Director of Partnerships",
-    organization: "Wavelink Sustainability Solutions",
+    name: "Wave Link Team",
+    email: "waavelink@gmail.com",
+    title: "Partnerships & Sustainability",
+    organization: "Wave Link",
   });
   const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
   const [companySigned] = useState(true);
@@ -110,7 +110,7 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-primary" />
             <span className="text-sm font-display font-semibold text-foreground">
-              Wavelink Contract Portal
+              Wave Link Contract Portal
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ const Index = () => {
                           Signed digitally
                         </p>
                         <p className="text-lg font-display italic text-signature-ink">
-                          Sarah Chen
+                          Wave Link Team
                         </p>
                         <p className="text-[10px] font-mono text-document-muted mt-1">
                           {currentDate} • IP: 192.168.***
@@ -260,7 +260,7 @@ const Index = () => {
       >
         <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
           <div className="flex items-center gap-4">
-            <span>© 2026 Wavelink Sustainability Solutions</span>
+            <span>© 2026 Wave Link — Smart Digital Solutions</span>
             <span className="text-border">|</span>
             <span>All rights reserved</span>
           </div>

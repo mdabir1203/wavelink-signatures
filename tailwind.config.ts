@@ -58,12 +58,12 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         wavelink: {
+          deep: "hsl(var(--wavelink-deep))",
           navy: "hsl(var(--wavelink-navy))",
-          slate: "hsl(var(--wavelink-slate))",
-          emerald: "hsl(var(--wavelink-emerald))",
-          "emerald-light": "hsl(var(--wavelink-emerald-light))",
-          gold: "hsl(var(--wavelink-gold))",
-          warm: "hsl(var(--wavelink-warm))",
+          blue: "hsl(var(--wavelink-blue))",
+          teal: "hsl(var(--wavelink-teal))",
+          cyan: "hsl(var(--wavelink-cyan))",
+          light: "hsl(var(--wavelink-light))",
         },
         document: {
           bg: "hsl(var(--document-bg))",
