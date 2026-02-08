@@ -15,6 +15,8 @@ interface SignerInfo {
   email: string;
   title: string;
   organization: string;
+  govId?: string;
+  taxId?: string;
 }
 
 const initialSigner: SignerInfo = {
@@ -22,6 +24,8 @@ const initialSigner: SignerInfo = {
   email: "",
   title: "",
   organization: "",
+  govId: "",
+  taxId: "",
 };
 
 const generateContractId = () => {
@@ -66,6 +70,8 @@ const Index = () => {
       ambassadorInfo.email.trim() !== "" &&
       ambassadorInfo.title.trim() !== "" &&
       ambassadorInfo.organization.trim() !== "" &&
+      (ambassadorInfo.govId || "").trim() !== "" &&
+      (ambassadorInfo.taxId || "").trim() !== "" &&
       ambassadorSignature !== null
     );
   };
@@ -74,7 +80,7 @@ const Index = () => {
     if (!isFormValid()) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all fields and provide your signature before signing.",
+        description: "Please fill in all fields including KYC details (Government ID & TIN) and provide your signature.",
         variant: "destructive",
       });
       return;
@@ -168,9 +174,13 @@ const Index = () => {
 
                 {/* Signature section */}
                 <div className="mt-10 pt-8 border-t-2 border-document-border">
-                  <h3 className="text-sm font-display font-semibold text-document-header tracking-wide mb-6">
-                    EXECUTION BY THE PARTIES
+                  <h3 className="text-sm font-display font-semibold text-document-header tracking-wide mb-2">
+                    AGREEMENT SIGN-OFF
                   </h3>
+                  <p className="text-xs font-body text-document-muted mb-6">
+                    Both parties must complete KYC verification before this agreement is considered binding.
+                    Ambassador KYC is required before the first payout per Section 1.3.
+                  </p>
 
                   <div className="grid md:grid-cols-2 gap-8">
                     {/* Company signer (pre-filled) */}
@@ -201,6 +211,7 @@ const Index = () => {
                         onChange={handleAmbassadorChange}
                         disabled={status === "signed"}
                         label="Ambassador"
+                        showKyc={true}
                       />
                       <SignaturePad
                         onSignatureChange={setAmbassadorSignature}
