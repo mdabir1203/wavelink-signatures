@@ -82,8 +82,6 @@ const SignContract = () => {
       ambassadorInfo.email.trim() !== "" &&
       ambassadorInfo.title.trim() !== "" &&
       ambassadorInfo.organization.trim() !== "" &&
-      (ambassadorInfo.govId || "").trim() !== "" &&
-      (ambassadorInfo.taxId || "").trim() !== "" &&
       ambassadorSignature !== null
     );
   };
@@ -92,7 +90,7 @@ const SignContract = () => {
     if (!isFormValid()) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all fields including KYC details (Government ID & TIN) and provide your signature.",
+        description: "Please fill in all fields and provide your signature.",
         variant: "destructive",
       });
       return;
@@ -270,8 +268,7 @@ const SignContract = () => {
                   AGREEMENT SIGN-OFF
                 </h3>
                 <p className="text-xs font-body text-document-muted mb-6">
-                  Both parties must complete KYC verification before this agreement is considered binding.
-                  Ambassador KYC is required before the first payout per Section 1.3.
+                  Both parties must sign below for this agreement to be considered binding.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-8">
