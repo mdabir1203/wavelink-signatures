@@ -47,7 +47,7 @@ const Index = () => {
   const [companyInfo] = useState<SignerInfo>({
     name: "Wave Link Team",
     email: "waavelink@gmail.com",
-    title: "Partnerships & Sustainability",
+    title: "Sustainability Ambassador / Partner",
     organization: "Wave Link",
   });
   const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
