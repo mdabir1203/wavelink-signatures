@@ -68,45 +68,79 @@ const ContractDocument: React.FC = () => {
       {/* Section 2: Milestone-Based Compensation */}
       <Section index={1} title="2. MILESTONE-BASED COMPENSATION">
         <p className="text-sm font-body text-document-text leading-relaxed mb-3">
-          Commission is <strong>not</strong> paid per-unit. It is unlocked only when the Ambassador reaches
-          specific sales volumes of Digital Cards or NFC Review Stands (1 Unit = 1 Card or 1 Stand). All
-          financial transactions shall comply with the Bangladesh Payment and Settlement Systems Regulations 2014.
+          You get paid for every sale you finish. No fixed hours—work when you want! Commission is
+          milestone-based, unlocked when the Ambassador reaches specific sales volumes. All financial
+          transactions shall comply with the Bangladesh Payment and Settlement Systems Regulations 2014.
         </p>
 
-        {/* Milestone Table */}
-        <div className="my-4 border border-document-border rounded-lg overflow-hidden">
-          <table className="w-full text-sm font-body">
-            <thead>
-              <tr className="bg-accent/50">
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-document-header tracking-wide border-b border-document-border">
-                  Milestone
-                </th>
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-document-header tracking-wide border-b border-document-border">
-                  Target
-                </th>
-                <th className="text-left px-4 py-2.5 text-xs font-semibold text-document-header tracking-wide border-b border-document-border">
-                  Payout (20% of Net Revenue)
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-document-border/50">
-                <td className="px-4 py-2.5 text-document-text font-medium">Level 1</td>
-                <td className="px-4 py-2.5 text-document-text">10 Units Sold</td>
-                <td className="px-4 py-2.5 text-document-text">20% of total revenue for the first 10 units</td>
-              </tr>
-              <tr className="border-b border-document-border/50 bg-accent/20">
-                <td className="px-4 py-2.5 text-document-text font-medium">Level 2</td>
-                <td className="px-4 py-2.5 text-document-text">20 Units Sold</td>
-                <td className="px-4 py-2.5 text-document-text">20% of total revenue for units 11–20</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2.5 text-document-text font-medium">Level 3</td>
-                <td className="px-4 py-2.5 text-document-text">30 Units Sold</td>
-                <td className="px-4 py-2.5 text-document-text">20% of total revenue for units 21–30</td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Commission Rates for Cards */}
+        <div className="mb-5">
+          <p className="text-xs font-display font-semibold text-document-header tracking-widest uppercase mb-3">
+            Commission Rates for Cards:
+          </p>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { target: "Sell 10 Cards", rate: "7%" },
+              { target: "Sell 20 Cards", rate: "14%" },
+              { target: "Sell 30 Cards", rate: "20%" },
+            ].map((item) => (
+              <div
+                key={item.target}
+                className="border border-document-border rounded-lg p-4 text-center bg-accent/10"
+              >
+                <p className="text-xs font-body text-document-muted mb-1">{item.target}</p>
+                <p className="text-xl font-display font-bold text-primary">{item.rate}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Review Stands & Partnerships */}
+        <div className="mb-5">
+          <p className="text-xs font-display font-semibold text-document-header tracking-widest uppercase mb-3">
+            Review Stands & Partnerships:
+          </p>
+          <div className="border border-document-border rounded-lg p-4 bg-accent/10">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-body font-semibold text-document-header">Large Organizations</p>
+              <p className="text-xl font-display font-bold text-primary">20%</p>
+            </div>
+            <p className="text-xs font-display font-semibold text-document-header tracking-widest uppercase mb-2">
+              Qualifying Examples:
+            </p>
+            <ul className="list-disc ml-5 space-y-0.5">
+              {[
+                "Gyms & Fitness Centers",
+                "Boutique Shops",
+                "Sports Zones",
+                "Theme Parks",
+                "Educational Institutions (Schools/Colleges)",
+                "SME Enterprises (Small/Medium Businesses)",
+                "Online Digital Marketplaces (can use loyalty cards)",
+                "Consultancy Houses",
+                "Coaching Centres",
+                "Wellness Centres",
+                "High-quality Hair Salons",
+              ].map((item) => (
+                <li key={item} className="text-sm font-body text-document-text leading-relaxed">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Single Unit Sales */}
+        <div className="mb-5">
+          <div className="border border-document-border rounded-lg p-4 bg-accent/10">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm font-body font-semibold text-document-header">Single Unit Sales</p>
+              <p className="text-xl font-display font-bold text-primary">5%</p>
+            </div>
+            <p className="text-sm font-body text-document-text leading-relaxed">
+              Direct sales of individual units to small business owners or individuals.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-2 ml-4">
@@ -118,6 +152,18 @@ const ContractDocument: React.FC = () => {
             <strong>Payout Timing:</strong> Payments are processed within ten (10) business days of reaching
             the milestone, via bank transfer or verified Mobile Financial Service (MFS) account. All
             applicable tax deductions at source (TDS) shall be withheld as per the Income Tax Ordinance 1984.
+          </p>
+        </div>
+      </Section>
+
+      {/* Section 2.5: Customer Verification & Reviews */}
+      <Section index={2} title="2A. CUSTOMER VERIFICATION & REVIEWS">
+        <p className="text-sm font-body text-document-text leading-relaxed mb-3">
+          Help customers verify their ID and ask them to post a quick review video on YouTube, TikTok, or Facebook.
+        </p>
+        <div className="border-l-4 border-destructive/40 bg-destructive/5 rounded-r-lg p-3">
+          <p className="text-xs font-body text-destructive leading-relaxed">
+            ⚠️ Payment is only sent after the customer is verified and Wavelink receives the funds.
           </p>
         </div>
       </Section>
@@ -218,63 +264,48 @@ const ContractDocument: React.FC = () => {
         </div>
       </Section>
 
-      {/* Section 5: Legal & Conduct */}
-      <Section index={4} title="5. LEGAL & CONDUCT STANDARDS">
-        <div className="space-y-3 ml-4">
-          <div>
-            <p className="text-sm font-body font-semibold text-document-header mb-1">
-              5.1 Independent Contractor Status:
-            </p>
-            <p className="text-sm font-body text-document-text leading-relaxed">
-              The Ambassador is an independent contractor, not an employee of Wave Link. This Agreement
-              does not create an employer-employee relationship under the Bangladesh Labour Act 2006.
-              The Ambassador is solely responsible for their own tax obligations, including filing income
-              tax returns with the National Board of Revenue (NBR) and payment of applicable taxes.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-body font-semibold text-document-header mb-1">
-              5.2 Data Privacy & Security:
-            </p>
-            <p className="text-sm font-body text-document-text leading-relaxed">
-              The Ambassador must handle all lead and customer information securely and in compliance with
-              the Digital Security Act 2018, the Information and Communication Technology Act 2006 (Section 63),
-              and any applicable data protection regulations. Unauthorized disclosure or misuse of personal
-              data shall constitute a material breach of this Agreement and may result in legal action under
-              the aforementioned statutes.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-body font-semibold text-document-header mb-1">
-              5.3 Non-Compete:
-            </p>
-            <p className="text-sm font-body text-document-text leading-relaxed">
-              During the term of this Agreement and for a period of six (6) months following termination,
-              the Ambassador may not promote, sell, or represent any competing NFC-based digital card or
-              review stand products within the territory of Bangladesh.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-body font-semibold text-document-header mb-1">
-              5.4 Intellectual Property:
-            </p>
-            <p className="text-sm font-body text-document-text leading-relaxed">
-              All promotional content created under this Agreement shall be jointly owned. The Ambassador
-              is granted a non-exclusive, revocable license to use Wave Link's trademarks and brand assets
-              solely for purposes outlined herein. Misuse of Wave Link's brand identity is strictly prohibited.
-            </p>
-          </div>
-          <div>
-            <p className="text-sm font-body font-semibold text-document-header mb-1">
-              5.5 Anti-Fraud & Compliance:
-            </p>
-            <p className="text-sm font-body text-document-text leading-relaxed">
-              Any attempt to fabricate sales, submit fraudulent KYC documents, or create "ghost leads" shall
-              result in immediate termination, forfeiture of all unpaid commissions, and may be reported to
-              the relevant authorities under the Penal Code 1860 (Section 420 — Cheating) and the Digital
-              Security Act 2018.
-            </p>
-          </div>
+      {/* Section 5: Simple Rules to Follow */}
+      <Section index={5} title="5. SIMPLE RULES TO FOLLOW">
+        <div className="space-y-3">
+          {[
+            {
+              num: 1,
+              title: "Follow the Law",
+              text: "You must respect the Bangladesh Cyber Security Act. This means you must keep customer information private and never share it with others.",
+            },
+            {
+              num: 2,
+              title: "Be Honest",
+              text: "When checking a customer's ID (KYC), always use real documents. Providing fake information is a crime and will end your work immediately.",
+            },
+            {
+              num: 3,
+              title: "Work Rules",
+              text: "We follow the Bangladesh Labour Act. You have full freedom to choose when you work, but you only get paid when a task is finished and confirmed.",
+            },
+            {
+              num: 4,
+              title: "After-Sales Help",
+              text: "Your job isn't finished when the sale is made. You must help the customer set up the app and make sure they are happy with their product.",
+            },
+            {
+              num: 5,
+              title: "Travel Support",
+              text: "If you have to travel more than 25km for a Wavelink meeting, we will pay for your bus/travel costs. Just keep your receipts!",
+            },
+          ].map((rule) => (
+            <div key={rule.num} className="flex gap-3 border border-document-border rounded-lg p-4 bg-accent/10">
+              <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary flex items-center justify-center">
+                <span className="text-xs font-display font-bold text-primary-foreground">{rule.num}</span>
+              </div>
+              <div>
+                <p className="text-sm font-body font-semibold text-document-header mb-1">
+                  {rule.title}:
+                </p>
+                <p className="text-sm font-body text-document-text leading-relaxed">{rule.text}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </Section>
 
