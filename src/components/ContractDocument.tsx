@@ -232,7 +232,7 @@ const ContractDocument: React.FC = () => {
             </p>
             <p className="text-sm font-body text-document-text leading-relaxed">
               Every fourteen (14) calendar days, the Ambassador must submit a "Pipeline & KYC Report"
-              to Wave Link via the designated reporting channel.
+              to Wave Link via <strong>WhatsApp</strong>.
             </p>
           </div>
           <div>
