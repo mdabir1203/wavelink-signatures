@@ -7,6 +7,8 @@ interface ContractRow {
   ambassador_email: string | null;
   ambassador_title: string | null;
   ambassador_organization: string | null;
+  ambassador_gov_id?: string | null;
+  ambassador_tax_id?: string | null;
   ambassador_signed_at: string | null;
   company_signed_at: string | null;
   created_at: string;
@@ -22,6 +24,8 @@ export function exportContractsCsv(contracts: ContractRow[]) {
     "Ambassador Email",
     "Ambassador Title",
     "Ambassador Organization",
+    "Ambassador GOV ID",
+    "Ambassador Tax ID",
     "Created",
     "Company Signed",
     "Ambassador Signed",
@@ -36,6 +40,8 @@ export function exportContractsCsv(contracts: ContractRow[]) {
     c.ambassador_email || "",
     c.ambassador_title || "",
     c.ambassador_organization || "",
+    c.ambassador_gov_id || "",
+    c.ambassador_tax_id || "",
     c.created_at,
     c.company_signed_at || "",
     c.ambassador_signed_at || "",

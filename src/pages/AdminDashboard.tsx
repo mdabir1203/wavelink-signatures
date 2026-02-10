@@ -21,6 +21,8 @@ interface Contract {
   ambassador_email: string | null;
   ambassador_title: string | null;
   ambassador_organization: string | null;
+  ambassador_gov_id?: string | null;
+  ambassador_tax_id?: string | null;
   ambassador_signed_at: string | null;
   company_signed_at: string | null;
   created_at: string;
@@ -63,7 +65,7 @@ const AdminDashboard = () => {
 
     const { data, error } = await supabase
       .from("contracts")
-      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_signed_at, company_signed_at, created_at")
+      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_gov_id, ambassador_tax_id, ambassador_signed_at, company_signed_at, created_at")
       .order("created_at", { ascending: false });
 
     if (error) {
