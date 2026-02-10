@@ -14,9 +14,9 @@ interface SignContractPayload {
   ambassador_email: string;
   ambassador_title: string;
   ambassador_organization: string;
-  ambassador_gov_id: string;
-  ambassador_tax_id: string;
   ambassador_signature_data: string;
+  // NOTE: KYC data (gov_id, tax_id) should NOT be sent from client
+  // These must be collected and validated server-side only
 }
 
 export async function createContract(payload: CreateContractPayload) {
@@ -78,6 +78,8 @@ export async function signContract(payload: SignContractPayload) {
   }
 
   // Update the contract with ambassador details
+  // SECURITY: Do NOT store signature_data or KYC info (gov_id, tax_id) from client
+  // These should be handled through secure server-side RPC/Edge Functions only
   const { data, error } = await supabase
     .from("contracts")
     .update({
@@ -86,12 +88,10 @@ export async function signContract(payload: SignContractPayload) {
       ambassador_email: payload.ambassador_email,
       ambassador_title: payload.ambassador_title,
       ambassador_organization: payload.ambassador_organization,
-      ambassador_gov_id: payload.ambassador_gov_id,
-      ambassador_tax_id: payload.ambassador_tax_id,
-      ambassador_signature_data: payload.ambassador_signature_data,
+      // Store hash of signature for verification only
+      ambassador_signature_hash: payload.ambassador_signature_data ? 
+        btoa(payload.ambassador_signature_data.substring(0, 100)) : null,
       ambassador_signed_at: new Date().toISOString(),
-      ip_address: "client",
-      user_agent: navigator.userAgent,
     } as any)
     .eq("access_token", payload.access_token)
     .select("id, contract_id, status, ambassador_signed_at")

@@ -7,10 +7,11 @@ import PrintableContract from "@/components/PrintableContract";
 interface SignerInfo {
   name: string;
   email: string;
-  title: string;
-  organization: string;
-  govId?: string;
-  taxId?: string;
+  futureTitle?: string;
+  nid?: string;
+  institution?: string;
+  // SECURITY: KYC data should NOT be included in PDF exports
+  // govId and taxId should be handled server-side only
 }
 
 interface ExportPdfOptions {
@@ -31,6 +32,15 @@ export function useExportPdf() {
     setExporting(true);
 
     try {
+      // SECURITY: Sanitize ambassador info to exclude KYC data
+      const sanitizedAmbassadorInfo = {
+        name: options.ambassadorInfo.name,
+        email: options.ambassadorInfo.email,
+        futureTitle: options.ambassadorInfo.futureTitle,
+        nid: options.ambassadorInfo.nid,
+        institution: options.ambassadorInfo.institution,
+      };
+
       // Create a hidden container
       const container = document.createElement("div");
       container.style.position = "fixed";
@@ -49,7 +59,7 @@ export function useExportPdf() {
             date={options.date}
             status={options.status}
             companyInfo={options.companyInfo}
-            ambassadorInfo={options.ambassadorInfo}
+            ambassadorInfo={sanitizedAmbassadorInfo}
             ambassadorSignatureData={options.ambassadorSignatureData}
             companySignedDate={options.companySignedDate}
             ambassadorSignedDate={options.ambassadorSignedDate}

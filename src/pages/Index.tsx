@@ -15,19 +15,21 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 interface SignerInfo {
   name: string;
   email: string;
-  title: string;
-  organization: string;
+  futureTitle?: string;
   govId?: string;
   taxId?: string;
+  nid?: string;
+  institution?: string;
 }
 
 const initialSigner: SignerInfo = {
   name: "",
   email: "",
-  title: "",
-  organization: "",
+  futureTitle: "",
   govId: "",
   taxId: "",
+  nid: "",
+  institution: "",
 };
 
 const generateContractId = () => {
@@ -74,8 +76,6 @@ const Index = () => {
     return (
       ambassadorInfo.name.trim() !== "" &&
       ambassadorInfo.email.trim() !== "" &&
-      ambassadorInfo.title.trim() !== "" &&
-      ambassadorInfo.organization.trim() !== "" &&
       (ambassadorInfo.govId || "").trim() !== "" &&
       (ambassadorInfo.taxId || "").trim() !== "" &&
       ambassadorSignature !== null
@@ -190,12 +190,17 @@ const Index = () => {
               className="text-xs font-body"
               disabled={exporting}
               onClick={() => {
+                // SECURITY: Sanitize ambassador info to exclude KYC data (govId, taxId)
+                const sanitizedAmbassadorInfo = {
+                  name: ambassadorInfo.name,
+                  email: ambassadorInfo.email,
+                };
                 exportPdf({
                   contractId,
                   date: currentDate,
                   status,
                   companyInfo,
-                  ambassadorInfo,
+                  ambassadorInfo: sanitizedAmbassadorInfo,
                   ambassadorSignatureData: ambassadorSignature,
                   companySignedDate: currentDate,
                   ambassadorSignedDate: status === "signed" ? currentDate : undefined,

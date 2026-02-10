@@ -4,10 +4,11 @@ import wavelinkLogo from "@/assets/wavelink-logo.png";
 interface SignerInfo {
   name: string;
   email: string;
-  title: string;
-  organization: string;
+  futureTitle?: string;
   govId?: string;
   taxId?: string;
+  nid?: string;
+  institution?: string;
 }
 
 interface PrintableContractProps {
@@ -322,9 +323,11 @@ interface SignerBlockProps {
     name: string;
     email: string;
     title: string;
-    organization: string;
+    futureTitle?: string;
     govId?: string;
     taxId?: string;
+    nid?: string;
+    institution?: string;
   };
   showKyc?: boolean;
 }
@@ -344,12 +347,8 @@ const SignerBlock: React.FC<SignerBlockProps> = ({ label, signer, showKyc }) => 
         <p style={{ fontWeight: 500 }}>{signer.email || "—"}</p>
       </div>
       <div>
-        <p style={{ fontSize: "9px", fontFamily: "'JetBrains Mono', monospace", color: "#6b7a8d", marginBottom: "2px" }}>Title / Role</p>
-        <p style={{ fontWeight: 500 }}>{signer.title || "—"}</p>
-      </div>
-      <div>
-        <p style={{ fontSize: "9px", fontFamily: "'JetBrains Mono', monospace", color: "#6b7a8d", marginBottom: "2px" }}>Organization</p>
-        <p style={{ fontWeight: 500 }}>{signer.organization || "—"}</p>
+        <p style={{ fontSize: "9px", fontFamily: "'JetBrains Mono', monospace", color: "#6b7a8d", marginBottom: "2px" }}>Future Title / Role</p>
+        <p style={{ fontWeight: 500 }}>{signer.futureTitle || "—"}</p>
       </div>
     </div>
     {showKyc && (

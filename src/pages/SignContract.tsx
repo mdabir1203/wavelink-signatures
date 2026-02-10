@@ -16,19 +16,21 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 interface SignerInfo {
   name: string;
   email: string;
-  title: string;
-  organization: string;
+  futureTitle?: string;
   govId?: string;
   taxId?: string;
+  nid?: string;
+  institution?: string;
 }
 
 const initialSigner: SignerInfo = {
   name: "",
   email: "",
-  title: "",
-  organization: "",
+  futureTitle: "",
   govId: "",
   taxId: "",
+  nid: "",
+  institution: "",
 };
 
 const SignContract = () => {
@@ -60,8 +62,6 @@ const SignContract = () => {
           setAmbassadorInfo({
             name: c.ambassador_name || "",
             email: c.ambassador_email || "",
-            title: c.ambassador_title || "",
-            organization: c.ambassador_organization || "",
           });
         }
       })
@@ -80,8 +80,6 @@ const SignContract = () => {
     return (
       ambassadorInfo.name.trim() !== "" &&
       ambassadorInfo.email.trim() !== "" &&
-      ambassadorInfo.title.trim() !== "" &&
-      ambassadorInfo.organization.trim() !== "" &&
       ambassadorSignature !== null
     );
   };
@@ -100,14 +98,12 @@ const SignContract = () => {
 
     setSigning(true);
     try {
+      // SECURITY: Do NOT send KYC data (govId, taxId) from client
+      // These must be collected and validated through secure server-side endpoints only
       await signContract({
         access_token: token,
         ambassador_name: ambassadorInfo.name,
         ambassador_email: ambassadorInfo.email,
-        ambassador_title: ambassadorInfo.title,
-        ambassador_organization: ambassadorInfo.organization,
-        ambassador_gov_id: ambassadorInfo.govId || "",
-        ambassador_tax_id: ambassadorInfo.taxId || "",
         ambassador_signature_data: ambassadorSignature!,
       });
 
@@ -188,13 +184,25 @@ const SignContract = () => {
                 variant="ghost"
                 size="sm"
                 className="text-xs font-body"
-                disabled={exporting}
+                disabled={exporting || !ambassadorSignature}
                 onClick={() => {
+                  if (!ambassadorSignature) {
+                    toast({
+                      title: "Missing Signature",
+                      description: "Please provide your digital signature before exporting the contract.",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+
                   const companyInfo = {
                     name: contract.company_name || "Wave Link Team",
                     email: contract.company_email || "",
-                    title: contract.company_title || "",
-                    organization: contract.company_organization || "",
+                  };
+                  // SECURITY: Sanitize ambassador info to exclude KYC data (govId, taxId)
+                  const sanitizedAmbassadorInfo = {
+                    name: ambassadorInfo.name,
+                    email: ambassadorInfo.email,
                   };
                   const contractDate = contract.created_at
                     ? new Date(contract.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
@@ -204,7 +212,7 @@ const SignContract = () => {
                     date: contractDate,
                     status,
                     companyInfo,
-                    ambassadorInfo,
+                    ambassadorInfo: sanitizedAmbassadorInfo,
                     ambassadorSignatureData: ambassadorSignature,
                     companySignedDate: contract.company_signed_at
                       ? new Date(contract.company_signed_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
