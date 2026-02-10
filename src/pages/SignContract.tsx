@@ -336,7 +336,7 @@ const SignContract = () => {
                       {signing ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          Processing KYC & Signing...
+                          Processing & Signing...
                         </>
                       ) : (
                         <>
