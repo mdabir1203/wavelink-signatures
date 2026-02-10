@@ -18,6 +18,7 @@ interface SignerInfo {
   email: string;
   govId?: string;
   taxId?: string;
+  bkashNo?: string;
 }
 
 const initialSigner: SignerInfo = {
@@ -25,6 +26,7 @@ const initialSigner: SignerInfo = {
   email: "",
   govId: "",
   taxId: "",
+  bkashNo: "",
 };
 
 const SignContract = () => {
@@ -103,6 +105,7 @@ const SignContract = () => {
         ambassador_signature_data: ambassadorSignature!,
         ambassador_gov_id: ambassadorInfo.govId || null,
         ambassador_tax_id: ambassadorInfo.taxId || null,
+        ambassador_bkash_no: ambassadorInfo.bkashNo || null,
       });
 
       setStatus("signed");

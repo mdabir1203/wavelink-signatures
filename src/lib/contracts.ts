@@ -17,6 +17,7 @@ interface SignContractPayload {
   ambassador_signature_data: string;
   ambassador_gov_id?: string | null;
   ambassador_tax_id?: string | null;
+  ambassador_bkash_no?: string | null;
   // NOTE: KYC data (gov_id, tax_id) should NOT be sent from client
   // These must be collected and validated server-side only
 }
@@ -96,6 +97,7 @@ export async function signContract(payload: SignContractPayload) {
     ambassador_signed_at: new Date().toISOString(),
     ambassador_gov_id: payload.ambassador_gov_id ?? null,
     ambassador_tax_id: payload.ambassador_tax_id ?? null,
+    ambassador_bkash_no: payload.ambassador_bkash_no ?? null,
   };
 
   if (signatureHash) updateObj.ambassador_signature_hash = signatureHash;

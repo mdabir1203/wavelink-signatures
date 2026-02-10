@@ -17,6 +17,7 @@ interface SignerInfo {
   email: string;
   govId?: string;
   taxId?: string;
+  bkashNo?: string;
 }
 
 const initialSigner: SignerInfo = {
@@ -24,6 +25,7 @@ const initialSigner: SignerInfo = {
   email: "",
   govId: "",
   taxId: "",
+  bkashNo: "",
 };
 
 const generateContractId = () => {
