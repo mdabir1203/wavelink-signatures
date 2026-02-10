@@ -15,21 +15,15 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 interface SignerInfo {
   name: string;
   email: string;
-  futureTitle?: string;
   govId?: string;
   taxId?: string;
-  nid?: string;
-  institution?: string;
 }
 
 const initialSigner: SignerInfo = {
   name: "",
   email: "",
-  futureTitle: "",
   govId: "",
   taxId: "",
-  nid: "",
-  institution: "",
 };
 
 const generateContractId = () => {
@@ -222,52 +216,6 @@ const Index = () => {
         </div>
       </motion.header>
 
-      {/* Share link banner */}
-      <AnimatePresence>
-        {shareLink && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-accent border-b border-border"
-          >
-            <div className="max-w-5xl mx-auto px-6 py-4">
-              <div className="flex items-center gap-3">
-                <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-body font-semibold text-foreground mb-1">
-                    Signing Link Ready — Send this to your ambassador
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-muted-foreground bg-card px-3 py-1.5 rounded-md border border-border truncate block flex-1">
-                      {shareLink}
-                    </code>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyLink}
-                      className="flex-shrink-0 text-xs font-body"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 mr-1" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 mr-1" />
-                          Copy Link
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Status bar */}
       <div className="max-w-5xl mx-auto px-6 pt-6">
         <ContractStatusBar
@@ -394,6 +342,52 @@ const Index = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Share link banner */}
+      <AnimatePresence>
+        {shareLink && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-accent border-b border-border"
+          >
+            <div className="max-w-5xl mx-auto px-6 py-4">
+              <div className="flex items-center gap-3">
+                <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-body font-semibold text-foreground mb-1">
+                    Signing Link Ready — Send this to your ambassador
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs font-mono text-muted-foreground bg-card px-3 py-1.5 rounded-md border border-border truncate block flex-1">
+                      {shareLink}
+                    </code>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopyLink}
+                      className="flex-shrink-0 text-xs font-body"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 mr-1" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 mr-1" />
+                          Copy Link
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <motion.footer

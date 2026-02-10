@@ -16,21 +16,15 @@ import { useExportPdf } from "@/hooks/useExportPdf";
 interface SignerInfo {
   name: string;
   email: string;
-  futureTitle?: string;
   govId?: string;
   taxId?: string;
-  nid?: string;
-  institution?: string;
 }
 
 const initialSigner: SignerInfo = {
   name: "",
   email: "",
-  futureTitle: "",
   govId: "",
   taxId: "",
-  nid: "",
-  institution: "",
 };
 
 const SignContract = () => {
