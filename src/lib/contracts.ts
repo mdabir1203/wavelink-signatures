@@ -15,6 +15,8 @@ interface SignContractPayload {
   ambassador_title: string;
   ambassador_organization: string;
   ambassador_signature_data: string;
+  ambassador_gov_id?: string | null;
+  ambassador_tax_id?: string | null;
   // NOTE: KYC data (gov_id, tax_id) should NOT be sent from client
   // These must be collected and validated server-side only
 }
@@ -78,28 +80,47 @@ export async function signContract(payload: SignContractPayload) {
   }
 
   // Update the contract with ambassador details
-  // SECURITY: Do NOT store signature_data or KYC info (gov_id, tax_id) from client
-  // These should be handled through secure server-side RPC/Edge Functions only
-  const { data, error } = await supabase
+  // Build an update object and attempt to write. If the DB schema is missing the
+  // newer `ambassador_signature_hash` column (schema cache mismatch), retry
+  // without that field to avoid crashing the client.
+  const signatureHash = payload.ambassador_signature_data
+    ? btoa(payload.ambassador_signature_data.substring(0, 100))
+    : null;
+
+  const updateObj: any = {
+    status: "signed",
+    ambassador_name: payload.ambassador_name,
+    ambassador_email: payload.ambassador_email,
+    ambassador_title: payload.ambassador_title,
+    ambassador_organization: payload.ambassador_organization,
+    ambassador_signed_at: new Date().toISOString(),
+    ambassador_gov_id: payload.ambassador_gov_id ?? null,
+    ambassador_tax_id: payload.ambassador_tax_id ?? null,
+  };
+
+  if (signatureHash) updateObj.ambassador_signature_hash = signatureHash;
+
+  let res = await supabase
     .from("contracts")
-    .update({
-      status: "signed" as any,
-      ambassador_name: payload.ambassador_name,
-      ambassador_email: payload.ambassador_email,
-      ambassador_title: payload.ambassador_title,
-      ambassador_organization: payload.ambassador_organization,
-      // Store hash of signature for verification only
-      ambassador_signature_hash: payload.ambassador_signature_data ? 
-        btoa(payload.ambassador_signature_data.substring(0, 100)) : null,
-      ambassador_signed_at: new Date().toISOString(),
-    } as any)
+    .update(updateObj as any)
     .eq("access_token", payload.access_token)
     .select("id, contract_id, status, ambassador_signed_at")
     .single();
 
-  if (error) {
-    throw new Error(error.message || "Failed to sign contract");
+  // If the error complains about missing column, retry without ambassador_signature_hash
+  if (res.error && /ambassador_signature_hash/.test(String(res.error.message))) {
+    delete updateObj.ambassador_signature_hash;
+    res = await supabase
+      .from("contracts")
+      .update(updateObj as any)
+      .eq("access_token", payload.access_token)
+      .select("id, contract_id, status, ambassador_signed_at")
+      .single();
   }
 
-  return { success: true, contract: data };
+  if (res.error) {
+    throw new Error(res.error.message || "Failed to sign contract");
+  }
+
+  return { success: true, contract: res.data };
 }

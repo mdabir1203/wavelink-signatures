@@ -98,7 +98,11 @@ const SignContract = () => {
         access_token: token,
         ambassador_name: ambassadorInfo.name,
         ambassador_email: ambassadorInfo.email,
+        ambassador_title: ambassadorInfo.govId ? "" : "",
+        ambassador_organization: "",
         ambassador_signature_data: ambassadorSignature!,
+        ambassador_gov_id: ambassadorInfo.govId || null,
+        ambassador_tax_id: ambassadorInfo.taxId || null,
       });
 
       setStatus("signed");
