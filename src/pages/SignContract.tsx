@@ -94,14 +94,10 @@ const SignContract = () => {
 
     setSigning(true);
     try {
-      // SECURITY: Do NOT send KYC data (govId, taxId) from client
-      // These must be collected and validated through secure server-side endpoints only
       await signContract({
         access_token: token,
         ambassador_name: ambassadorInfo.name,
         ambassador_email: ambassadorInfo.email,
-        ambassador_title: ambassadorInfo.govId ? "" : "",
-        ambassador_organization: "",
         ambassador_signature_data: ambassadorSignature!,
         ambassador_gov_id: ambassadorInfo.govId || null,
         ambassador_tax_id: ambassadorInfo.taxId || null,
@@ -160,7 +156,6 @@ const SignContract = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top bar */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -196,11 +191,10 @@ const SignContract = () => {
                     return;
                   }
 
-                  const companyInfo = {
+                  const companyInfoForPdf = {
                     name: contract.company_name || "Wave Link Team",
                     email: contract.company_email || "",
                   };
-                  // SECURITY: Sanitize ambassador info to exclude KYC data (govId, taxId)
                   const sanitizedAmbassadorInfo = {
                     name: ambassadorInfo.name,
                     email: ambassadorInfo.email,
@@ -212,7 +206,7 @@ const SignContract = () => {
                     contractId: contract.contract_id,
                     date: contractDate,
                     status,
-                    companyInfo,
+                    companyInfo: companyInfoForPdf,
                     ambassadorInfo: sanitizedAmbassadorInfo,
                     ambassadorSignatureData: ambassadorSignature,
                     companySignedDate: contract.company_signed_at
@@ -240,7 +234,6 @@ const SignContract = () => {
         </div>
       </motion.header>
 
-      {/* Status bar */}
       <div className="max-w-5xl mx-auto px-6 pt-6">
         <ContractStatusBar
           status={status}
@@ -249,7 +242,6 @@ const SignContract = () => {
         />
       </div>
 
-      {/* Document */}
       <div className="max-w-5xl mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -271,7 +263,6 @@ const SignContract = () => {
 
               <ContractDocument />
 
-              {/* Signature section */}
               <div className="mt-10 pt-8 border-t-2 border-document-border">
                 <h3 className="text-sm font-display font-semibold text-document-header tracking-wide mb-2">
                   AGREEMENT SIGN-OFF
@@ -281,14 +272,11 @@ const SignContract = () => {
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-8">
-                  {/* Company signer */}
                   <div className="space-y-4">
                     <SignerForm
                       signer={{
                         name: contract.company_name,
                         email: contract.company_email,
-                        title: contract.company_title,
-                        organization: contract.company_organization,
                       }}
                       onChange={() => {}}
                       disabled={true}
@@ -312,7 +300,6 @@ const SignContract = () => {
                     </div>
                   </div>
 
-                  {/* Ambassador signer */}
                   <div className="space-y-4">
                     <SignerForm
                       signer={ambassadorInfo}
@@ -328,7 +315,6 @@ const SignContract = () => {
                   </div>
                 </div>
 
-                {/* Sign button */}
                 {status !== "signed" && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -368,7 +354,6 @@ const SignContract = () => {
         </motion.div>
       </div>
 
-      {/* Footer */}
       <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LogOut, Download, FileSpreadsheet, Loader2, FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { LogOut, FileSpreadsheet, Loader2, FileText, CheckCircle2, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,9 +21,6 @@ interface Contract {
   ambassador_email: string | null;
   ambassador_title: string | null;
   ambassador_organization: string | null;
-  ambassador_gov_id?: string | null;
-  ambassador_tax_id?: string | null;
-  ambassador_bkash_no?: string | null;
   ambassador_signed_at: string | null;
   company_signed_at: string | null;
   created_at: string;
@@ -66,13 +63,13 @@ const AdminDashboard = () => {
 
     const { data, error } = await supabase
       .from("contracts")
-      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_gov_id, ambassador_tax_id, ambassador_bkash_no, ambassador_signed_at, company_signed_at, created_at")
+      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_signed_at, company_signed_at, created_at")
       .order("created_at", { ascending: false });
 
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: "Error", description: "Failed to load contracts.", variant: "destructive" });
     } else {
-      setContracts(data || []);
+      setContracts((data as Contract[]) || []);
     }
     setLoading(false);
   };
@@ -129,7 +126,6 @@ const AdminDashboard = () => {
       </motion.header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
             { label: "Total Contracts", value: contracts.length, color: "text-foreground" },
@@ -148,7 +144,6 @@ const AdminDashboard = () => {
           ))}
         </div>
 
-        {/* Table */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
