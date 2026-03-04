@@ -111,13 +111,10 @@ export type Database = {
     Views: {
       contracts_public: {
         Row: {
-          access_token: string | null
-          ambassador_email: string | null
           ambassador_name: string | null
           ambassador_organization: string | null
           ambassador_signed_at: string | null
           ambassador_title: string | null
-          company_email: string | null
           company_name: string | null
           company_organization: string | null
           company_signed_at: string | null
@@ -129,13 +126,10 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
-          access_token?: string | null
-          ambassador_email?: string | null
           ambassador_name?: string | null
           ambassador_organization?: string | null
           ambassador_signed_at?: string | null
           ambassador_title?: string | null
-          company_email?: string | null
           company_name?: string | null
           company_organization?: string | null
           company_signed_at?: string | null
@@ -147,13 +141,10 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
-          access_token?: string | null
-          ambassador_email?: string | null
           ambassador_name?: string | null
           ambassador_organization?: string | null
           ambassador_signed_at?: string | null
           ambassador_title?: string | null
-          company_email?: string | null
           company_name?: string | null
           company_organization?: string | null
           company_signed_at?: string | null
@@ -168,6 +159,27 @@ export type Database = {
       }
     }
     Functions: {
+      get_contract_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          ambassador_email: string
+          ambassador_name: string
+          ambassador_organization: string
+          ambassador_signed_at: string
+          ambassador_title: string
+          company_email: string
+          company_name: string
+          company_organization: string
+          company_signature_data: string
+          company_signed_at: string
+          company_title: string
+          contract_id: string
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["contract_status"]
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

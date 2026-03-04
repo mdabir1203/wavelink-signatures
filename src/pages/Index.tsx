@@ -42,11 +42,9 @@ const Index = () => {
   const { exportPdf, exporting } = useExportPdf();
   const [status, setStatus] = useState<"draft" | "pending" | "signed">("draft");
   const [ambassadorInfo, setAmbassadorInfo] = useState<SignerInfo>(initialSigner);
-  const [companyInfo] = useState<SignerInfo>({
+  const [companyInfo] = useState({
     name: "Wave Link Team",
     email: "waavelink@gmail.com",
-    title: "Sustainability Ambassador / Partner",
-    organization: "Wave Link",
   });
   const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
   const [companySigned] = useState(true);
@@ -78,7 +76,6 @@ const Index = () => {
     );
   };
 
-  // Local signing (for preview purposes)
   const handleLocalSign = () => {
     if (!isFormValid()) {
       toast({
@@ -100,7 +97,6 @@ const Index = () => {
     }, 2000);
   };
 
-  // Send to ambassador: creates contract in DB and generates shareable link
   const handleSendForSigning = async () => {
     setSending(true);
     try {
@@ -108,8 +104,8 @@ const Index = () => {
         contract_id: contractId,
         company_name: companyInfo.name,
         company_email: companyInfo.email,
-        company_title: companyInfo.title,
-        company_organization: companyInfo.organization,
+        company_title: "Sustainability Ambassador / Partner",
+        company_organization: "Wave Link",
       });
 
       const baseUrl = window.location.origin;
@@ -186,7 +182,6 @@ const Index = () => {
               className="text-xs font-body"
               disabled={exporting}
               onClick={() => {
-                // SECURITY: Sanitize ambassador info to exclude KYC data (govId, taxId)
                 const sanitizedAmbassadorInfo = {
                   name: ambassadorInfo.name,
                   email: ambassadorInfo.email,

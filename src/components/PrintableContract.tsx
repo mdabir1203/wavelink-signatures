@@ -322,7 +322,7 @@ interface SignerBlockProps {
   signer: {
     name: string;
     email: string;
-    title: string;
+    title?: string;
     futureTitle?: string;
     govId?: string;
     taxId?: string;
