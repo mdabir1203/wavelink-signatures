@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2, Loader2 } from "lucide-react";
+import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2, Loader2, TrendingUp } from "lucide-react";
 import ContractHeader from "@/components/ContractHeader";
 import ContractDocument from "@/components/ContractDocument";
 import ContractStatusBar from "@/components/ContractStatusBar";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { createContract } from "@/lib/contracts";
 import { useExportPdf } from "@/hooks/useExportPdf";
+import ProfitCalculator from "@/components/ProfitCalculator";
 
 interface SignerInfo {
   name: string;
@@ -52,6 +53,7 @@ const Index = () => {
   const [shareLink, setShareLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [sending, setSending] = useState(false);
+  const [showProfitCalc, setShowProfitCalc] = useState(false);
 
   const currentDate = new Date().toLocaleDateString("en-US", {
     year: "numeric",
@@ -172,6 +174,10 @@ const Index = () => {
                 New Contract
               </Button>
             )}
+            <Button variant="ghost" size="sm" className="text-xs font-body text-emerald-500 hover:text-emerald-400" onClick={() => setShowProfitCalc(true)}>
+              <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
+              Check Your Profit Potential
+            </Button>
             <Button variant="ghost" size="sm" className="text-xs font-body">
               <Eye className="w-3.5 h-3.5 mr-1.5" />
               Preview
@@ -256,7 +262,7 @@ const Index = () => {
                     <div className="space-y-4">
                       <SignerForm
                         signer={companyInfo}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         disabled={true}
                         label="Company Representative"
                       />
@@ -405,6 +411,8 @@ const Index = () => {
           </div>
         </div>
       </motion.footer>
+      {/* Profit Calculator Popup */}
+      <ProfitCalculator open={showProfitCalc} onClose={() => setShowProfitCalc(false)} />
     </div>
   );
 };
