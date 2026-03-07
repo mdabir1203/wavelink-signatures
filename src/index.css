@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 210 40% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 40% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 40% 12%;
+
+    --primary: 200 75% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 200 20% 93%;
+    --secondary-foreground: 210 40% 12%;
+
+    --muted: 210 15% 95%;
+    --muted-foreground: 210 12% 50%;
+
+    --accent: 195 60% 90%;
+    --accent-foreground: 200 75% 28%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 18% 88%;
+    --input: 210 18% 88%;
+    --ring: 200 75% 35%;
+
+    --radius: 0.5rem;
+
+    /* WaveLink brand tokens */
+    --wavelink-deep: 210 60% 22%;
+    --wavelink-navy: 205 55% 30%;
+    --wavelink-blue: 200 75% 38%;
+    --wavelink-teal: 185 65% 42%;
+    --wavelink-cyan: 178 55% 50%;
+    --wavelink-light: 195 50% 92%;
+
+    /* Document tokens */
+    --document-bg: 210 15% 97%;
+    --document-border: 210 12% 86%;
+    --document-header: 210 60% 22%;
+    --document-text: 210 30% 20%;
+    --document-muted: 210 12% 55%;
+
+    /* Signature */
+    --signature-bg: 210 20% 96%;
+    --signature-border: 200 40% 70%;
+    --signature-ink: 210 60% 22%;
+
+    /* Status colors */
+    --status-draft: 42 80% 55%;
+    --status-pending: 25 85% 55%;
+    --status-signed: 200 75% 38%;
+
+    /* Shadows */
+    --shadow-document: 0 8px 32px -8px hsl(210 40% 12% / 0.12);
+    --shadow-card: 0 2px 12px -2px hsl(210 40% 12% / 0.08);
+    --shadow-signature: inset 0 2px 6px hsl(210 40% 12% / 0.06);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 210 35% 8%;
+    --foreground: 210 20% 92%;
+
+    --card: 210 30% 12%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 210 30% 12%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 200 65% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 25% 18%;
+    --secondary-foreground: 210 20% 92%;
+
+    --muted: 210 20% 16%;
+    --muted-foreground: 210 15% 60%;
+
+    --accent: 195 30% 18%;
+    --accent-foreground: 195 45% 75%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 20% 20%;
+    --input: 210 20% 20%;
+    --ring: 200 65% 50%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-body {
+    font-family: 'Source Sans 3', system-ui, sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .document-shadow {
+    box-shadow: var(--shadow-document);
+  }
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .signature-shadow {
+    box-shadow: var(--shadow-signature);
+  }
+
+  .watermark {
+    position: relative;
+  }
+
+  .watermark::before {
+    content: 'WAVELINK';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-35deg);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 6rem;
+    font-weight: 700;
+    color: hsl(200 75% 38% / 0.04);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+    letter-spacing: 0.2em;
+  }
+}
