@@ -1,109 +1,79 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Eye, PenLine, RotateCcw, Send, Copy, Check, Link2, Loader2 } from "lucide-react";
-import ContractHeader from "@/components/ContractHeader";
-import ContractDocument from "@/components/ContractDocument";
-import ContractStatusBar from "@/components/ContractStatusBar";
-import SignaturePad from "@/components/SignaturePad";
-import SignerForm from "@/components/SignerForm";
-import SignedStamp from "@/components/SignedStamp";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { createContract } from "@/lib/contracts";
-import { useExportPdf } from "@/hooks/useExportPdf";
-
-interface SignerInfo {
-  name: string;
-  email: string;
-  govId?: string;
-  taxId?: string;
-  bkashNo?: string;
-}
-
-const initialSigner: SignerInfo = {
-  name: "",
-  email: "",
-  govId: "",
-  taxId: "",
-  bkashNo: "",
-};
+import ProgressBar from "@/components/onboarding/ProgressBar";
+import LanguageSelector from "@/components/onboarding/LanguageSelector";
+import StepWelcome from "@/components/onboarding/StepWelcome";
+import StepRole from "@/components/onboarding/StepRole";
+import StepReality from "@/components/onboarding/StepReality";
+import StepMilestones from "@/components/onboarding/StepMilestones";
+import StepProducts from "@/components/onboarding/StepProducts";
+import StepRules from "@/components/onboarding/StepRules";
+import StepCommitment from "@/components/onboarding/StepCommitment";
+import StepSignature, { SignaturePayload } from "@/components/onboarding/StepSignature";
+import { Language, t } from "@/lib/i18n";
 
 const generateContractId = () => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let id = "WL-";
-  for (let i = 0; i < 8; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
+  for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
   return id;
 };
 
 const Index = () => {
-  const [contractId] = useState(generateContractId());
-  const { exportPdf, exporting } = useExportPdf();
-  const [status, setStatus] = useState<"draft" | "pending" | "signed">("draft");
-  const [ambassadorInfo, setAmbassadorInfo] = useState<SignerInfo>(initialSigner);
-  const [companyInfo] = useState({
-    name: "Wave Link Team",
-    email: "waavelink@gmail.com",
-  });
-  const [ambassadorSignature, setAmbassadorSignature] = useState<string | null>(null);
-  const [companySigned] = useState(true);
-  const [showStamp, setShowStamp] = useState(false);
+  const [lang, setLang] = useState<Language>("en");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [shareLink, setShareLink] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [sending, setSending] = useState(false);
+  const [commitmentDone, setCommitmentDone] = useState(false);
+  const [signaturePayload, setSignaturePayload] = useState<SignaturePayload | null>(null);
 
-  const currentDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const steps = [
+    { key: "welcome", cta: t(lang, "welcomeCta") },
+    { key: "role", cta: t(lang, "roleCta") },
+    { key: "reality", cta: t(lang, "realityCta") },
+    { key: "milestones", cta: t(lang, "milestonesCta") },
+    { key: "products", cta: t(lang, "productsCta") },
+    { key: "rules", cta: t(lang, "rulesCta") },
+    { key: "commitment", cta: t(lang, "commitCta") },
+    { key: "signature", cta: submitting ? t(lang, "submitting") : t(lang, "signCta") },
+  ];
 
-  const handleAmbassadorChange = useCallback(
-    (field: keyof SignerInfo, value: string) => {
-      setAmbassadorInfo((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+  const isLast = currentStep === steps.length - 1;
 
-  const isFormValid = () => {
-    return (
-      ambassadorInfo.name.trim() !== "" &&
-      ambassadorInfo.email.trim() !== "" &&
-      (ambassadorInfo.govId || "").trim() !== "" &&
-      (ambassadorInfo.taxId || "").trim() !== "" &&
-      ambassadorSignature !== null
-    );
-  };
-
-  const handleLocalSign = () => {
-    if (!isFormValid()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all fields including KYC details (Government ID & TIN) and provide your signature.",
-        variant: "destructive",
-      });
-      return;
+  const renderStep = () => {
+    switch (steps[currentStep].key) {
+      case "welcome": return <StepWelcome lang={lang} />;
+      case "role": return <StepRole lang={lang} />;
+      case "reality": return <StepReality lang={lang} />;
+      case "milestones": return <StepMilestones lang={lang} />;
+      case "products": return <StepProducts lang={lang} />;
+      case "rules": return <StepRules lang={lang} />;
+      case "commitment": return <StepCommitment lang={lang} onAllChecked={setCommitmentDone} />;
+      case "signature": return <StepSignature lang={lang} onSignatureComplete={setSignaturePayload} />;
+      default: return null;
     }
-
-    setStatus("pending");
-    setTimeout(() => {
-      setStatus("signed");
-      setShowStamp(true);
-      toast({
-        title: "Contract Signed Successfully",
-        description: "The agreement has been fully executed. All parties have signed.",
-      });
-    }, 2000);
   };
 
-  const handleSendForSigning = async () => {
-    setSending(true);
+  const canProceed = () => {
+    if (steps[currentStep].key === "commitment") return commitmentDone;
+    if (isLast) return !!signaturePayload && !submitting;
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!signaturePayload || submitting) return;
+    setSubmitting(true);
+
     try {
+      const contractId = generateContractId();
       const result = await createContract({
         contract_id: contractId,
-        company_name: companyInfo.name,
-        company_email: companyInfo.email,
+        company_name: "Wave Link Team",
+        company_email: "waavelink@gmail.com",
         company_title: "Sustainability Ambassador / Partner",
         company_organization: "Wave Link",
       });
@@ -111,300 +81,134 @@ const Index = () => {
       const baseUrl = window.location.origin;
       const link = `${baseUrl}/sign/${result.contract.access_token}`;
       setShareLink(link);
-      setStatus("pending");
+      setCompleted(true);
 
-      toast({
-        title: "Contract Created & Ready to Share",
-        description: "Copy the signing link below and send it to your ambassador.",
-      });
+      toast({ title: t(lang, "doneTitle"), description: t(lang, "doneSubtitle") });
     } catch (err: any) {
       toast({
-        title: "Error Creating Contract",
-        description: err.message || "Something went wrong. Please try again.",
+        title: "Error",
+        description: err.message || "Something went wrong.",
         variant: "destructive",
       });
-    } finally {
-      setSending(false);
+      setSubmitting(false);
     }
   };
 
-  const handleCopyLink = () => {
-    if (!shareLink) return;
-    navigator.clipboard.writeText(shareLink);
-    setCopied(true);
-    toast({ title: "Link Copied!", description: "Signing link copied to clipboard." });
-    setTimeout(() => setCopied(false), 2000);
+  const next = () => {
+    if (isLast) handleSubmit();
+    else setCurrentStep((s) => s + 1);
   };
 
-  const handleReset = () => {
-    setStatus("draft");
-    setShowStamp(false);
-    setAmbassadorInfo(initialSigner);
-    setAmbassadorSignature(null);
-    setShareLink(null);
-    setCopied(false);
+  const back = () => {
+    if (currentStep > 0) setCurrentStep((s) => s - 1);
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Top navigation bar */}
-      <motion.header
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border"
-      >
-        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-primary" />
-            <span className="text-sm font-display font-semibold text-foreground">
-              Wave Link Contract Portal
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {(status === "signed" || shareLink) && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-                className="text-xs font-body"
-              >
-                <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                New Contract
-              </Button>
-            )}
-            <Button variant="ghost" size="sm" className="text-xs font-body">
-              <Eye className="w-3.5 h-3.5 mr-1.5" />
-              Preview
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs font-body"
-              disabled={exporting}
-              onClick={() => {
-                const sanitizedAmbassadorInfo = {
-                  name: ambassadorInfo.name,
-                  email: ambassadorInfo.email,
-                };
-                exportPdf({
-                  contractId,
-                  date: currentDate,
-                  status,
-                  companyInfo,
-                  ambassadorInfo: sanitizedAmbassadorInfo,
-                  ambassadorSignatureData: ambassadorSignature,
-                  companySignedDate: currentDate,
-                  ambassadorSignedDate: status === "signed" ? currentDate : undefined,
-                }).then(() => {
-                  toast({ title: "PDF Exported", description: "Your contract has been downloaded." });
-                }).catch(() => {
-                  toast({ title: "Export Failed", description: "Could not generate PDF. Please try again.", variant: "destructive" });
-                });
-              }}
-            >
-              {exporting ? (
-                <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-              ) : (
-                <Download className="w-3.5 h-3.5 mr-1.5" />
-              )}
-              {exporting ? "Generating..." : "Export PDF"}
-            </Button>
-          </div>
-        </div>
-      </motion.header>
-
-      {/* Status bar */}
-      <div className="max-w-5xl mx-auto px-6 pt-6">
-        <ContractStatusBar
-          status={status}
-          signerCount={2}
-          signedCount={status === "signed" ? 2 : companySigned ? 1 : 0}
-        />
-      </div>
-
-      {/* Main document */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <div className="relative">
+  if (completed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-8 text-center gap-6 bg-gradient-to-br from-wavelink-light to-background">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200 }}
+          className="relative"
+        >
+          <CheckCircle2 className="w-20 h-20 text-wavelink-teal" />
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-card rounded-xl document-shadow border border-border overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="absolute -top-2 -right-2"
           >
-            <div className="watermark relative p-10 md:p-14">
-              <div className="relative z-10">
-                <ContractHeader
-                  contractId={contractId}
-                  status={status}
-                  date={currentDate}
-                />
-
-                <ContractDocument />
-
-                {/* Signature section */}
-                <div className="mt-10 pt-8 border-t-2 border-document-border">
-                  <h3 className="text-sm font-display font-semibold text-document-header tracking-wide mb-2">
-                    AGREEMENT SIGN-OFF
-                  </h3>
-                  <p className="text-xs font-body text-document-muted mb-6">
-                    Both parties must complete KYC verification before this agreement is considered binding.
-                    Ambassador KYC is required before the first payout per Section 1.3.
-                  </p>
-
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Company signer (pre-filled) */}
-                    <div className="space-y-4">
-                      <SignerForm
-                        signer={companyInfo}
-                        onChange={() => {}}
-                        disabled={true}
-                        label="Company Representative"
-                      />
-                      <div className="rounded-lg border-2 border-signature-border bg-signature-bg p-4">
-                        <p className="text-xs font-mono text-document-muted mb-1">
-                          Signed digitally
-                        </p>
-                        <p className="text-lg font-display italic text-signature-ink">
-                          Wave Link Team
-                        </p>
-                        <p className="text-[10px] font-mono text-document-muted mt-1">
-                          {currentDate} • Verified
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Ambassador signer */}
-                    <div className="space-y-4">
-                      <SignerForm
-                        signer={ambassadorInfo}
-                        onChange={handleAmbassadorChange}
-                        disabled={status === "signed" || !!shareLink}
-                        label="Ambassador"
-                        showKyc={true}
-                      />
-                      <SignaturePad
-                        onSignatureChange={setAmbassadorSignature}
-                        disabled={status === "signed" || !!shareLink}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Action buttons */}
-                  {status === "draft" && !shareLink && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                      className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
-                    >
-                      <Button
-                        onClick={handleSendForSigning}
-                        disabled={sending}
-                        size="lg"
-                        className="px-8 font-body font-semibold tracking-wide"
-                      >
-                        {sending ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
-                            Creating Contract...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-4 h-4 mr-2" />
-                            Send for Signing
-                          </>
-                        )}
-                      </Button>
-                      <span className="text-xs text-muted-foreground font-body">or</span>
-                      <Button
-                        onClick={handleLocalSign}
-                        variant="outline"
-                        size="lg"
-                        className="px-8 font-body font-semibold tracking-wide"
-                      >
-                        <PenLine className="w-4 h-4 mr-2" />
-                        Sign Locally
-                      </Button>
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-
-              <SignedStamp
-                show={showStamp}
-                signerName={ambassadorInfo.name || "Ambassador"}
-                date={currentDate}
-              />
-            </div>
+            <Sparkles className="w-6 h-6 text-wavelink-cyan" />
           </motion.div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Share link banner */}
-      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="space-y-3"
+        >
+          <h1 className="text-3xl font-bold font-display">{t(lang, "doneTitle")}</h1>
+          <p className="text-muted-foreground max-w-xs font-body">{t(lang, "doneSubtitle")}</p>
+          <p className="text-sm text-wavelink-teal font-medium italic font-body">{t(lang, "doneQuote")}</p>
+        </motion.div>
+
         {shareLink && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-accent border-b border-border"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="w-full max-w-sm space-y-3"
           >
-            <div className="max-w-5xl mx-auto px-6 py-4">
-              <div className="flex items-center gap-3">
-                <Link2 className="w-4 h-4 text-primary flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-body font-semibold text-foreground mb-1">
-                    Signing Link Ready — Send this to your ambassador
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono text-muted-foreground bg-card px-3 py-1.5 rounded-md border border-border truncate block flex-1">
-                      {shareLink}
-                    </code>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyLink}
-                      className="flex-shrink-0 text-xs font-body"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 mr-1" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 mr-1" />
-                          Copy Link
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+            <div className="glass-card rounded-xl p-4 space-y-2">
+              <p className="text-xs font-semibold text-foreground">Signing Link:</p>
+              <code className="text-[10px] font-mono text-muted-foreground bg-muted px-3 py-2 rounded-lg block break-all">
+                {shareLink}
+              </code>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(shareLink);
+                  toast({ title: "Copied!", description: "Link copied to clipboard." });
+                }}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-wavelink-teal to-wavelink-blue text-primary-foreground text-sm font-semibold"
+              >
+                Copy Signing Link 📋
+              </button>
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Footer */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="max-w-5xl mx-auto px-6 pb-10"
-      >
-        <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <span>© 2026 Wave Link — Smart Digital Solutions</span>
-            <span className="text-border">|</span>
-            <span>All rights reserved</span>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <a href="/admin/login" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+            Admin Dashboard →
+          </a>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-wavelink-light to-background">
+      <LanguageSelector lang={lang} onSelect={setLang} />
+      <ProgressBar currentStep={currentStep} totalSteps={steps.length} lang={lang} />
+
+      <div className="flex-1 flex flex-col py-6 overflow-y-auto">
+        <AnimatePresence mode="wait">
+          <div key={currentStep}>
+            {renderStep()}
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-status-signed animate-pulse-soft" />
-            <span>Secure Document Portal</span>
-          </div>
-        </div>
-      </motion.footer>
+        </AnimatePresence>
+      </div>
+
+      <div className="px-8 pb-8 space-y-3">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={next}
+          disabled={!canProceed()}
+          className={`w-full bg-gradient-to-r from-wavelink-teal to-wavelink-blue text-primary-foreground font-semibold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all font-body ${
+            !canProceed() ? "opacity-50 cursor-not-allowed" : "hover:shadow-xl"
+          }`}
+        >
+          {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
+          {steps[currentStep].cta}
+          {!submitting && <ArrowRight className="w-4 h-4" />}
+        </motion.button>
+
+        {currentStep > 0 && (
+          <button
+            onClick={back}
+            className="w-full text-muted-foreground text-sm py-2 flex items-center justify-center gap-1 hover:text-foreground transition-colors font-body"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            {t(lang, "back")}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
