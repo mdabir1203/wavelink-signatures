@@ -9,6 +9,7 @@ import StepWelcome from "@/components/onboarding/StepWelcome";
 import StepRole from "@/components/onboarding/StepRole";
 import StepReality from "@/components/onboarding/StepReality";
 import StepMilestones from "@/components/onboarding/StepMilestones";
+import StepPerks from "@/components/onboarding/StepPerks";
 import StepProducts from "@/components/onboarding/StepProducts";
 import StepRules from "@/components/onboarding/StepRules";
 import StepCommitment from "@/components/onboarding/StepCommitment";
@@ -36,6 +37,7 @@ const Index = () => {
     { key: "role", cta: t(lang, "roleCta") },
     { key: "reality", cta: t(lang, "realityCta") },
     { key: "milestones", cta: t(lang, "milestonesCta") },
+    { key: "perks", cta: t(lang, "perksCta") },
     { key: "products", cta: t(lang, "productsCta") },
     { key: "rules", cta: t(lang, "rulesCta") },
     { key: "commitment", cta: t(lang, "commitCta") },
@@ -50,6 +52,7 @@ const Index = () => {
       case "role": return <StepRole lang={lang} />;
       case "reality": return <StepReality lang={lang} />;
       case "milestones": return <StepMilestones lang={lang} />;
+      case "perks": return <StepPerks lang={lang} />;
       case "products": return <StepProducts lang={lang} />;
       case "rules": return <StepRules lang={lang} />;
       case "commitment": return <StepCommitment lang={lang} onAllChecked={setCommitmentDone} />;
