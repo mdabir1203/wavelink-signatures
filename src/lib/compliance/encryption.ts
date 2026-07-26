@@ -3,11 +3,11 @@
 // Add your encryption logic and methods
 
 export function encryptData(data: string): string {
-    // Encryption logic
-    return encryptedData;
+    // TODO: real encryption
+    return data;
 }
 
 export function decryptData(encryptedData: string): string {
-    // Decryption logic
-    return data;
+    // TODO: real decryption
+    return encryptedData;
 }
