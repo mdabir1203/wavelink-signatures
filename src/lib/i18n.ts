@@ -50,6 +50,24 @@ type TranslationKeys = {
   milestoneTip: string;
   milestonesCta: string;
 
+  // Perks (creative bonuses)
+  perksTitle: string;
+  perksSubtitle: string;
+  perkVideoTitle: string;
+  perkVideoDesc: string;
+  perkPhotoTitle: string;
+  perkPhotoDesc: string;
+  perkReferralTitle: string;
+  perkReferralDesc: string;
+  perkStreakTitle: string;
+  perkStreakDesc: string;
+  perkLeaderTitle: string;
+  perkLeaderDesc: string;
+  perkSwagTitle: string;
+  perkSwagDesc: string;
+  perksTip: string;
+  perksCta: string;
+
   // Products
   productsTitle: string;
   productsSubtitle: string;
