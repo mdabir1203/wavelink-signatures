@@ -50,6 +50,24 @@ type TranslationKeys = {
   milestoneTip: string;
   milestonesCta: string;
 
+  // Perks (creative bonuses)
+  perksTitle: string;
+  perksSubtitle: string;
+  perkVideoTitle: string;
+  perkVideoDesc: string;
+  perkPhotoTitle: string;
+  perkPhotoDesc: string;
+  perkReferralTitle: string;
+  perkReferralDesc: string;
+  perkStreakTitle: string;
+  perkStreakDesc: string;
+  perkLeaderTitle: string;
+  perkLeaderDesc: string;
+  perkSwagTitle: string;
+  perkSwagDesc: string;
+  perksTip: string;
+  perksCta: string;
+
   // Products
   productsTitle: string;
   productsSubtitle: string;
@@ -158,6 +176,23 @@ const en: TranslationKeys = {
   milestoneTip: "Commission rate increases as you hit each milestone!",
   milestonesCta: "Show me the products 📦",
 
+  perksTitle: "Fun perks & bonuses 🎁",
+  perksSubtitle: "Get creative — earn extra beyond commission. Content wins prizes.",
+  perkVideoTitle: "🎬 Viral Video Bonus",
+  perkVideoDesc: "Post a Reel/TikTok tagging @wavelink. 10k+ views = ৳1,000 bonus. 100k+ = ৳10,000.",
+  perkPhotoTitle: "📸 Photo Drop Reward",
+  perkPhotoDesc: "Snap a customer using their card & post it — ৳200 per approved photo, up to 10/week.",
+  perkReferralTitle: "🤝 Bring-A-Friend",
+  perkReferralDesc: "Refer another ambassador who closes a deal → you get 2% of their first month.",
+  perkStreakTitle: "🔥 Weekly Streak",
+  perkStreakDesc: "Close a deal every week for 4 weeks = ৳2,000 streak bonus + gold badge.",
+  perkLeaderTitle: "🏆 Top of the Wave",
+  perkLeaderDesc: "Monthly leaderboard #1 wins a cash prize + featured on our socials.",
+  perkSwagTitle: "🎒 Swag & Events",
+  perkSwagDesc: "Hoodies, stickers, and invites to Wave Link founder meetups & launch parties.",
+  perksTip: "🚀 Content creators earn 2-3× more. Get loud, get paid.",
+  perksCta: "Love it — show products 📦",
+
   productsTitle: "What you'll sell 📦",
   productsSubtitle: "NFC cards for individuals & review stands for businesses.",
   reviewStands: "Review Stands & Partnerships",
@@ -260,6 +295,23 @@ const bn: TranslationKeys = {
   milestoneTip: "প্রতিটি মাইলস্টোনে কমিশন রেট বাড়ে!",
   milestonesCta: "প্রোডাক্ট দেখান 📦",
 
+  perksTitle: "মজার পার্ক ও বোনাস 🎁",
+  perksSubtitle: "ক্রিয়েটিভ হন — কমিশনের বাইরে বাড়তি আয়। কন্টেন্টে জিতুন পুরস্কার।",
+  perkVideoTitle: "🎬 ভাইরাল ভিডিও বোনাস",
+  perkVideoDesc: "@wavelink ট্যাগ করে Reel/TikTok পোস্ট করুন। ১০k+ ভিউ = ৳১,০০০ বোনাস। ১০০k+ = ৳১০,০০০।",
+  perkPhotoTitle: "📸 ফটো ড্রপ রিওয়ার্ড",
+  perkPhotoDesc: "কাস্টমারের কার্ড ব্যবহারের ছবি পোস্ট করুন — অনুমোদিত ছবি প্রতি ৳২০০, সপ্তাহে ১০টা পর্যন্ত।",
+  perkReferralTitle: "🤝 বন্ধু-আনুন",
+  perkReferralDesc: "নতুন অ্যাম্বাসেডর রেফার করুন যিনি ডিল ক্লোজ করেন → তার প্রথম মাসের ২% আপনার।",
+  perkStreakTitle: "🔥 সাপ্তাহিক স্ট্রিক",
+  perkStreakDesc: "৪ সপ্তাহ প্রতি সপ্তাহে ডিল = ৳২,০০০ স্ট্রিক বোনাস + গোল্ড ব্যাজ।",
+  perkLeaderTitle: "🏆 টপ অফ দ্য ওয়েভ",
+  perkLeaderDesc: "মাসিক লিডারবোর্ড #১ ক্যাশ প্রাইজ + আমাদের সোশ্যালে ফিচার।",
+  perkSwagTitle: "🎒 সোয়াগ ও ইভেন্ট",
+  perkSwagDesc: "হুডি, স্টিকার, এবং Wave Link ফাউন্ডার মিটআপ ও লঞ্চ পার্টিতে আমন্ত্রণ।",
+  perksTip: "🚀 কন্টেন্ট ক্রিয়েটররা ২-৩× বেশি আয় করে। জোরে বলুন, বেশি পান।",
+  perksCta: "দুর্দান্ত — প্রোডাক্ট দেখান 📦",
+
   productsTitle: "কী বিক্রি করবেন 📦",
   productsSubtitle: "ব্যক্তিদের জন্য NFC কার্ড ও ব্যবসার জন্য রিভিউ স্ট্যান্ড।",
   reviewStands: "রিভিউ স্ট্যান্ড ও পার্টনারশিপ",
@@ -361,6 +413,23 @@ const hi: TranslationKeys = {
   sell30: "30 कार्ड बेचें",
   milestoneTip: "हर माइलस्टोन पर कमीशन रेट बढ़ता है!",
   milestonesCta: "प्रोडक्ट दिखाओ 📦",
+
+  perksTitle: "मज़ेदार पर्क्स और बोनस 🎁",
+  perksSubtitle: "क्रिएटिव बनो — कमीशन के अलावा एक्स्ट्रा कमाओ। कंटेंट से इनाम।",
+  perkVideoTitle: "🎬 वायरल वीडियो बोनस",
+  perkVideoDesc: "@wavelink टैग करके Reel/TikTok पोस्ट करें। 10k+ व्यूज़ = ₹1,000 बोनस। 100k+ = ₹10,000।",
+  perkPhotoTitle: "📸 फ़ोटो ड्रॉप रिवॉर्ड",
+  perkPhotoDesc: "कस्टमर के कार्ड इस्तेमाल की फ़ोटो पोस्ट करें — प्रति अप्रूव्ड फ़ोटो ₹200, हफ्ते में 10 तक।",
+  perkReferralTitle: "🤝 दोस्त-लाओ",
+  perkReferralDesc: "नए एम्बेसडर को रेफर करें जो डील क्लोज़ करे → उसके पहले महीने का 2% आपका।",
+  perkStreakTitle: "🔥 वीकली स्ट्रीक",
+  perkStreakDesc: "4 हफ्ते हर हफ्ते डील = ₹2,000 स्ट्रीक बोनस + गोल्ड बैज।",
+  perkLeaderTitle: "🏆 टॉप ऑफ़ द वेव",
+  perkLeaderDesc: "मासिक लीडरबोर्ड #1 को कैश प्राइज़ + हमारे सोशल पर फ़ीचर।",
+  perkSwagTitle: "🎒 स्वैग और इवेंट्स",
+  perkSwagDesc: "हुडी, स्टिकर, और Wave Link फ़ाउंडर मीटअप व लॉन्च पार्टियों में न्योता।",
+  perksTip: "🚀 कंटेंट क्रिएटर 2-3× ज़्यादा कमाते हैं। ज़ोर से बोलो, ज़्यादा पाओ।",
+  perksCta: "बढ़िया — प्रोडक्ट दिखाओ 📦",
 
   productsTitle: "क्या बेचेंगे 📦",
   productsSubtitle: "व्यक्तियों के लिए NFC कार्ड और बिज़नेस के लिए रिव्यू स्टैंड।",
