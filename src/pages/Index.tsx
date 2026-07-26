@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -29,8 +29,19 @@ const Index = () => {
   const [completed, setCompleted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [statusLink, setStatusLink] = useState<string | null>(null);
+  const [referralLink, setReferralLink] = useState<string | null>(null);
+  const [referredBy, setReferredBy] = useState<string | null>(null);
   const [commitmentDone, setCommitmentDone] = useState(false);
   const [signaturePayload, setSignaturePayload] = useState<SignaturePayload | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref && /^WL-[A-Z0-9]{4,20}$/.test(ref)) {
+      setReferredBy(ref);
+    }
+  }, []);
 
   const steps = [
     { key: "welcome", cta: t(lang, "welcomeCta") },
@@ -79,11 +90,16 @@ const Index = () => {
         company_email: "waavelink@gmail.com",
         company_title: "Sustainability Ambassador / Partner",
         company_organization: "Wave Link",
+        referred_by: referredBy,
       });
 
       const baseUrl = window.location.origin;
       const link = `${baseUrl}/sign/${result.contract.access_token}`;
+      const meLink = `${baseUrl}/me/${result.contract.access_token}`;
+      const refLink = `${baseUrl}/?ref=${result.contract.contract_id}`;
       setShareLink(link);
+      setStatusLink(meLink);
+      setReferralLink(refLink);
       setCompleted(true);
 
       toast({ title: t(lang, "doneTitle"), description: t(lang, "doneSubtitle") });
@@ -159,6 +175,33 @@ const Index = () => {
                 Copy Signing Link 📋
               </button>
             </div>
+
+            {referralLink && (
+              <div className="glass-card rounded-xl p-4 space-y-2 border-2 border-wavelink-teal/30">
+                <p className="text-xs font-semibold text-foreground">🎁 Your Referral Link (earn bonus points):</p>
+                <code className="text-[10px] font-mono text-muted-foreground bg-muted px-3 py-2 rounded-lg block break-all">
+                  {referralLink}
+                </code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(referralLink);
+                    toast({ title: "Copied!", description: "Share it — every signed referral = 1 bonus point." });
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-wavelink-teal to-wavelink-blue text-primary-foreground text-sm font-semibold"
+                >
+                  Copy Referral Link 🎁
+                </button>
+              </div>
+            )}
+
+            {statusLink && (
+              <a
+                href={statusLink}
+                className="block text-center text-xs text-wavelink-teal font-semibold underline underline-offset-4"
+              >
+                View my ambassador status page →
+              </a>
+            )}
           </motion.div>
         )}
 

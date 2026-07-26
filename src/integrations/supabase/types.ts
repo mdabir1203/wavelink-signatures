@@ -35,6 +35,7 @@ export type Database = {
           created_at: string
           id: string
           ip_address: string | null
+          referred_by: string | null
           status: Database["public"]["Enums"]["contract_status"]
           updated_at: string
           user_agent: string | null
@@ -59,6 +60,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          referred_by?: string | null
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
           user_agent?: string | null
@@ -83,6 +85,7 @@ export type Database = {
           created_at?: string
           id?: string
           ip_address?: string | null
+          referred_by?: string | null
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
           user_agent?: string | null
@@ -178,6 +181,16 @@ export type Database = {
           id: string
           status: Database["public"]["Enums"]["contract_status"]
           updated_at: string
+        }[]
+      }
+      get_referral_stats: {
+        Args: { p_token: string }
+        Returns: {
+          ambassador_name: string
+          contract_id: string
+          points: number
+          signed_referrals: number
+          status: Database["public"]["Enums"]["contract_status"]
         }[]
       }
       has_role: {
