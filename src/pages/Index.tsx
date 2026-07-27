@@ -32,6 +32,7 @@ const Index = () => {
   const [statusLink, setStatusLink] = useState<string | null>(null);
   const [referralLink, setReferralLink] = useState<string | null>(null);
   const [referredBy, setReferredBy] = useState<string | null>(null);
+  const [campaign, setCampaign] = useState<string | null>(null);
   const [commitmentDone, setCommitmentDone] = useState(false);
   const [signaturePayload, setSignaturePayload] = useState<SignaturePayload | null>(null);
 
@@ -40,6 +41,10 @@ const Index = () => {
     const ref = params.get("ref");
     if (ref && /^WL-[A-Z0-9]{4,20}$/.test(ref)) {
       setReferredBy(ref);
+    }
+    const c = params.get("campaign");
+    if (c && /^[A-Za-z0-9_-]{1,40}$/.test(c)) {
+      setCampaign(c);
     }
   }, []);
 
@@ -91,6 +96,7 @@ const Index = () => {
         company_title: "Sustainability Ambassador / Partner",
         company_organization: "Wave Link",
         referred_by: referredBy,
+        campaign: campaign,
       });
 
       const baseUrl = window.location.origin;
