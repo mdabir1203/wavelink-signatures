@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
     // Check contract exists and is pending
     const { data: existing, error: fetchErr } = await supabaseAdmin
       .from("contracts")
-      .select("id, status")
+      .select("id, status, referred_by, campaign")
       .eq("access_token", access_token)
       .maybeSingle();
 
@@ -154,6 +154,44 @@ Deno.serve(async (req) => {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Notify referrer (in-app; email hook is a no-op until an email domain is configured)
+    if ((existing as any).referred_by) {
+      try {
+        await supabaseAdmin.from("referral_notifications").insert({
+          referrer_contract_id: (existing as any).referred_by,
+          referred_contract_id: data.contract_id,
+          referred_ambassador_name: ambassador_name.trim(),
+          campaign: (existing as any).campaign || null,
+          channel: "in_app",
+        });
+
+        // Optional email hop — only fires if the send-transactional-email function exists.
+        const { data: referrer } = await supabaseAdmin
+          .from("contracts")
+          .select("ambassador_email, ambassador_name, contract_id")
+          .eq("contract_id", (existing as any).referred_by)
+          .maybeSingle();
+        if (referrer?.ambassador_email) {
+          try {
+            await supabaseAdmin.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "referral-signed",
+                recipientEmail: referrer.ambassador_email,
+                idempotencyKey: `referral-signed-${data.contract_id}`,
+                templateData: {
+                  referrerName: referrer.ambassador_name,
+                  referredName: ambassador_name.trim(),
+                  campaign: (existing as any).campaign || null,
+                },
+              },
+            });
+          } catch (_) { /* email infra not set up yet — safe to ignore */ }
+        }
+      } catch (e) {
+        console.error("referral notification failed", e);
+      }
     }
 
     return new Response(JSON.stringify({ success: true, contract: data }), {
