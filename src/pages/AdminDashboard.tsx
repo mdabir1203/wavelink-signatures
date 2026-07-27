@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { exportContractsCsv } from "@/lib/exportCsv";
+import { exportContractsCsv, exportCampaignMetricsCsv } from "@/lib/exportCsv";
 
 interface Contract {
   id: string;
@@ -24,6 +24,8 @@ interface Contract {
   ambassador_signed_at: string | null;
   company_signed_at: string | null;
   created_at: string;
+  referred_by: string | null;
+  campaign: string | null;
 }
 
 const statusConfig: Record<string, { icon: React.ReactNode; className: string }> = {
@@ -63,7 +65,7 @@ const AdminDashboard = () => {
 
     const { data, error } = await supabase
       .from("contracts")
-      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_signed_at, company_signed_at, created_at")
+      .select("id, contract_id, status, company_name, company_email, ambassador_name, ambassador_email, ambassador_title, ambassador_organization, ambassador_signed_at, company_signed_at, created_at, referred_by, campaign")
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -82,6 +84,31 @@ const AdminDashboard = () => {
   const handleExportCsv = () => {
     exportContractsCsv(contracts);
     toast({ title: "Exported", description: "CSV file downloaded." });
+  };
+
+  const handleExportCampaignCsv = () => {
+    const map = new Map<string, { referrer_contract_id: string; referrer_name: string | null; campaign: string; total: number; signed: number; pending: number }>();
+    const nameByContract = new Map<string, string | null>();
+    contracts.forEach((c) => nameByContract.set(c.contract_id, c.ambassador_name));
+    contracts.forEach((c) => {
+      if (!c.referred_by) return;
+      const campaign = c.campaign || "(none)";
+      const key = `${c.referred_by}::${campaign}`;
+      const existing = map.get(key) || {
+        referrer_contract_id: c.referred_by,
+        referrer_name: nameByContract.get(c.referred_by) ?? null,
+        campaign,
+        total: 0,
+        signed: 0,
+        pending: 0,
+      };
+      existing.total += 1;
+      if (c.status === "signed") existing.signed += 1;
+      else if (c.status === "pending") existing.pending += 1;
+      map.set(key, existing);
+    });
+    exportCampaignMetricsCsv(Array.from(map.values()));
+    toast({ title: "Exported", description: "Campaign metrics CSV downloaded." });
   };
 
   const formatDate = (d: string | null) =>
@@ -116,6 +143,10 @@ const AdminDashboard = () => {
             <Button variant="outline" size="sm" className="text-xs font-body" onClick={handleExportCsv}>
               <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" />
               Export CSV
+            </Button>
+            <Button variant="outline" size="sm" className="text-xs font-body" onClick={handleExportCampaignCsv}>
+              <FileSpreadsheet className="w-3.5 h-3.5 mr-1.5" />
+              Campaign Metrics
             </Button>
             <Button variant="ghost" size="sm" className="text-xs font-body" onClick={handleLogout}>
               <LogOut className="w-3.5 h-3.5 mr-1.5" />
