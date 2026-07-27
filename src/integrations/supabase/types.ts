@@ -25,6 +25,7 @@ export type Database = {
           ambassador_signed_at: string | null
           ambassador_tax_id: string | null
           ambassador_title: string | null
+          campaign: string | null
           company_email: string
           company_name: string
           company_organization: string
@@ -50,6 +51,7 @@ export type Database = {
           ambassador_signed_at?: string | null
           ambassador_tax_id?: string | null
           ambassador_title?: string | null
+          campaign?: string | null
           company_email?: string
           company_name?: string
           company_organization?: string
@@ -75,6 +77,7 @@ export type Database = {
           ambassador_signed_at?: string | null
           ambassador_tax_id?: string | null
           ambassador_title?: string | null
+          campaign?: string | null
           company_email?: string
           company_name?: string
           company_organization?: string
@@ -89,6 +92,39 @@ export type Database = {
           status?: Database["public"]["Enums"]["contract_status"]
           updated_at?: string
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      referral_notifications: {
+        Row: {
+          campaign: string | null
+          channel: string
+          created_at: string
+          id: string
+          read_at: string | null
+          referred_ambassador_name: string | null
+          referred_contract_id: string
+          referrer_contract_id: string
+        }
+        Insert: {
+          campaign?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          referred_ambassador_name?: string | null
+          referred_contract_id: string
+          referrer_contract_id: string
+        }
+        Update: {
+          campaign?: string | null
+          channel?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          referred_ambassador_name?: string | null
+          referred_contract_id?: string
+          referrer_contract_id?: string
         }
         Relationships: []
       }
@@ -183,10 +219,22 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_referral_notifications: {
+        Args: { p_token: string }
+        Returns: {
+          campaign: string
+          created_at: string
+          id: string
+          read_at: string
+          referred_ambassador_name: string
+          referred_contract_id: string
+        }[]
+      }
       get_referral_stats: {
         Args: { p_token: string }
         Returns: {
           ambassador_name: string
+          campaigns: Json
           contract_id: string
           points: number
           signed_referrals: number
@@ -199,6 +247,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_referral_notifications_read: {
+        Args: { p_token: string }
+        Returns: number
       }
     }
     Enums: {

@@ -7,6 +7,7 @@ interface CreateContractPayload {
   company_title?: string;
   company_organization?: string;
   referred_by?: string | null;
+  campaign?: string | null;
 }
 
 interface SignContractPayload {
@@ -32,7 +33,8 @@ export async function createContract(payload: CreateContractPayload) {
       company_signed_at: new Date().toISOString(),
       company_signature_data: "Wave Link Team",
       referred_by: payload.referred_by || null,
-    })
+      campaign: payload.campaign || null,
+    } as any)
     .select("id, contract_id, access_token")
     .single();
 
@@ -53,6 +55,18 @@ export async function getReferralStats(accessToken: string) {
   }
   const row = Array.isArray(data) ? data[0] : data;
   return { success: true, stats: row };
+}
+
+export async function getReferralNotifications(accessToken: string) {
+  const { data, error } = await (supabase.rpc as any)("get_referral_notifications", {
+    p_token: accessToken,
+  });
+  if (error) throw new Error("Failed to load notifications");
+  return { success: true, notifications: (data as any[]) || [] };
+}
+
+export async function markReferralNotificationsRead(accessToken: string) {
+  await (supabase.rpc as any)("mark_referral_notifications_read", { p_token: accessToken });
 }
 
 export async function getContract(accessToken: string) {
