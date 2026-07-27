@@ -13,6 +13,8 @@ interface ContractRow {
   ambassador_signed_at: string | null;
   company_signed_at: string | null;
   created_at: string;
+  referred_by?: string | null;
+  campaign?: string | null;
 }
 
 export function exportContractsCsv(contracts: ContractRow[]) {
@@ -31,6 +33,8 @@ export function exportContractsCsv(contracts: ContractRow[]) {
     "Created",
     "Company Signed",
     "Ambassador Signed",
+    "Referred By",
+    "Campaign",
   ];
 
   const rows = contracts.map((c) => [
@@ -48,6 +52,8 @@ export function exportContractsCsv(contracts: ContractRow[]) {
     c.created_at,
     c.company_signed_at || "",
     c.ambassador_signed_at || "",
+    c.referred_by || "",
+    c.campaign || "",
   ]);
 
   const csvContent = [
@@ -60,6 +66,34 @@ export function exportContractsCsv(contracts: ContractRow[]) {
   const a = document.createElement("a");
   a.href = url;
   a.download = `wavelink-contracts-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+interface CampaignRow {
+  referrer_contract_id: string;
+  referrer_name: string | null;
+  campaign: string;
+  total: number;
+  signed: number;
+  pending: number;
+}
+
+export function exportCampaignMetricsCsv(rows: CampaignRow[]) {
+  const headers = ["Referrer Contract", "Referrer Name", "Campaign", "Total", "Signed", "Pending"];
+  const csv = [
+    headers.join(","),
+    ...rows.map((r) =>
+      [r.referrer_contract_id, r.referrer_name || "", r.campaign, r.total, r.signed, r.pending]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(","),
+    ),
+  ].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `wavelink-campaign-metrics-${new Date().toISOString().slice(0, 10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
