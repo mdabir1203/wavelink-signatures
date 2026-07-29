@@ -252,15 +252,53 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-wavelink-light to-background">
-      <LanguageSelector lang={lang} onSelect={setLang} />
+    <div className="relative min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-wavelink-light to-background">
+      <AmbientJourney step={currentStep} />
+      <ChapterIntro step={currentStep} lang={lang} show={chapterVisible} />
+
+      <div className="flex items-center justify-between pr-5">
+        <LanguageSelector lang={lang} onSelect={setLang} />
+        <button
+          onClick={() => {
+            setMuted((m) => !m);
+            haptic(8);
+          }}
+          aria-label={muted ? "Unmute journey sounds" : "Mute journey sounds"}
+          className="mt-4 rounded-full border border-border bg-card/70 p-2 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+        >
+          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </button>
+      </div>
+
       <ProgressBar currentStep={currentStep} totalSteps={steps.length} lang={lang} />
+
+      <div className="px-6 pt-3">
+        <motion.p
+          key={`whisper-${currentStep}-${lang}`}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="font-body text-[11px] italic text-muted-foreground"
+        >
+          <span className="font-mono not-italic uppercase tracking-[0.25em] text-wavelink-teal">
+            {chapterLabel(lang)} {getChapter(lang, currentStep).number}
+          </span>
+          {" · "}
+          {getChapter(lang, currentStep).whisper}
+        </motion.p>
+      </div>
 
       <div className="flex-1 flex flex-col py-6 overflow-y-auto">
         <AnimatePresence mode="wait">
-          <div key={currentStep}>
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
             {renderStep()}
-          </div>
+          </motion.div>
         </AnimatePresence>
       </div>
 
