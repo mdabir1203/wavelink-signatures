@@ -124,6 +124,8 @@ const Index = () => {
       setStatusLink(meLink);
       setReferralLink(refLink);
       setCompleted(true);
+      fanfare(muted);
+      haptic([18, 60, 24, 60, 40]);
 
       toast({ title: t(lang, "doneTitle"), description: t(lang, "doneSubtitle") });
     } catch (err: any) {
@@ -153,7 +155,9 @@ const Index = () => {
 
   if (completed) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-8 text-center gap-6 bg-gradient-to-br from-wavelink-light to-background">
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center gap-6 bg-gradient-to-br from-wavelink-light to-background">
+        <AmbientJourney step={steps.length} />
+        <Celebration />
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
