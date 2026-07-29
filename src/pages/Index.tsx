@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { createContract } from "@/lib/contracts";
 import ProgressBar from "@/components/onboarding/ProgressBar";
 import LanguageSelector from "@/components/onboarding/LanguageSelector";
+import AmbientJourney from "@/components/onboarding/AmbientJourney";
+import ChapterIntro from "@/components/onboarding/ChapterIntro";
+import Celebration from "@/components/onboarding/Celebration";
+import { chapterLabel, getChapter } from "@/lib/journey";
+import { chime, fanfare, haptic } from "@/lib/feedback";
 import StepWelcome from "@/components/onboarding/StepWelcome";
 import StepRole from "@/components/onboarding/StepRole";
 import StepReality from "@/components/onboarding/StepReality";
@@ -35,6 +40,18 @@ const Index = () => {
   const [campaign, setCampaign] = useState<string | null>(null);
   const [commitmentDone, setCommitmentDone] = useState(false);
   const [signaturePayload, setSignaturePayload] = useState<SignaturePayload | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [chapterVisible, setChapterVisible] = useState(true);
+  const chapterTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    setChapterVisible(true);
+    if (chapterTimer.current) window.clearTimeout(chapterTimer.current);
+    chapterTimer.current = window.setTimeout(() => setChapterVisible(false), 1700);
+    return () => {
+      if (chapterTimer.current) window.clearTimeout(chapterTimer.current);
+    };
+  }, [currentStep]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -120,11 +137,17 @@ const Index = () => {
   };
 
   const next = () => {
-    if (isLast) handleSubmit();
-    else setCurrentStep((s) => s + 1);
+    haptic(14);
+    if (isLast) {
+      handleSubmit();
+    } else {
+      chime(muted, currentStep);
+      setCurrentStep((s) => s + 1);
+    }
   };
 
   const back = () => {
+    haptic(8);
     if (currentStep > 0) setCurrentStep((s) => s - 1);
   };
 
