@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Loader2, Volume2, VolumeX } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { createContract } from "@/lib/contracts";
 import ProgressBar from "@/components/onboarding/ProgressBar";
 import LanguageSelector from "@/components/onboarding/LanguageSelector";
+import AmbientJourney from "@/components/onboarding/AmbientJourney";
+import ChapterIntro from "@/components/onboarding/ChapterIntro";
+import Celebration from "@/components/onboarding/Celebration";
+import { chapterLabel, getChapter } from "@/lib/journey";
+import { chime, fanfare, haptic } from "@/lib/feedback";
 import StepWelcome from "@/components/onboarding/StepWelcome";
 import StepRole from "@/components/onboarding/StepRole";
 import StepReality from "@/components/onboarding/StepReality";
@@ -35,6 +40,18 @@ const Index = () => {
   const [campaign, setCampaign] = useState<string | null>(null);
   const [commitmentDone, setCommitmentDone] = useState(false);
   const [signaturePayload, setSignaturePayload] = useState<SignaturePayload | null>(null);
+  const [muted, setMuted] = useState(false);
+  const [chapterVisible, setChapterVisible] = useState(true);
+  const chapterTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    setChapterVisible(true);
+    if (chapterTimer.current) window.clearTimeout(chapterTimer.current);
+    chapterTimer.current = window.setTimeout(() => setChapterVisible(false), 1700);
+    return () => {
+      if (chapterTimer.current) window.clearTimeout(chapterTimer.current);
+    };
+  }, [currentStep]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -107,6 +124,8 @@ const Index = () => {
       setStatusLink(meLink);
       setReferralLink(refLink);
       setCompleted(true);
+      fanfare(muted);
+      haptic([18, 60, 24, 60, 40]);
 
       toast({ title: t(lang, "doneTitle"), description: t(lang, "doneSubtitle") });
     } catch (err: any) {
@@ -120,17 +139,25 @@ const Index = () => {
   };
 
   const next = () => {
-    if (isLast) handleSubmit();
-    else setCurrentStep((s) => s + 1);
+    haptic(14);
+    if (isLast) {
+      handleSubmit();
+    } else {
+      chime(muted, currentStep);
+      setCurrentStep((s) => s + 1);
+    }
   };
 
   const back = () => {
+    haptic(8);
     if (currentStep > 0) setCurrentStep((s) => s - 1);
   };
 
   if (completed) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-8 text-center gap-6 bg-gradient-to-br from-wavelink-light to-background">
+      <div className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center gap-6 bg-gradient-to-br from-wavelink-light to-background">
+        <AmbientJourney step={steps.length} />
+        <Celebration />
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -225,15 +252,53 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-wavelink-light to-background">
-      <LanguageSelector lang={lang} onSelect={setLang} />
+    <div className="relative min-h-screen flex flex-col max-w-md mx-auto bg-gradient-to-br from-wavelink-light to-background">
+      <AmbientJourney step={currentStep} />
+      <ChapterIntro step={currentStep} lang={lang} show={chapterVisible} />
+
+      <div className="flex items-center justify-between pr-5">
+        <LanguageSelector lang={lang} onSelect={setLang} />
+        <button
+          onClick={() => {
+            setMuted((m) => !m);
+            haptic(8);
+          }}
+          aria-label={muted ? "Unmute journey sounds" : "Mute journey sounds"}
+          className="mt-4 rounded-full border border-border bg-card/70 p-2 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+        >
+          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </button>
+      </div>
+
       <ProgressBar currentStep={currentStep} totalSteps={steps.length} lang={lang} />
+
+      <div className="px-6 pt-3">
+        <motion.p
+          key={`whisper-${currentStep}-${lang}`}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="font-body text-[11px] italic text-muted-foreground"
+        >
+          <span className="font-mono not-italic uppercase tracking-[0.25em] text-wavelink-teal">
+            {chapterLabel(lang)} {getChapter(lang, currentStep).number}
+          </span>
+          {" · "}
+          {getChapter(lang, currentStep).whisper}
+        </motion.p>
+      </div>
 
       <div className="flex-1 flex flex-col py-6 overflow-y-auto">
         <AnimatePresence mode="wait">
-          <div key={currentStep}>
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, y: 24, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -16, filter: "blur(8px)" }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
             {renderStep()}
-          </div>
+          </motion.div>
         </AnimatePresence>
       </div>
 
