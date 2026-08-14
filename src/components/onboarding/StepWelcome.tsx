@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Language, t } from "@/lib/i18n";
+import partnerAsset from "@/assets/wavelink-partner.webp.asset.json";
 
 interface StepWelcomeProps {
   lang: Language;
@@ -14,14 +15,17 @@ const StepWelcome = ({ lang }: StepWelcomeProps) => {
       className="flex flex-col items-center justify-center flex-1 px-8 text-center gap-6"
     >
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1, type: "spring", stiffness: 180 }}
-        className="animate-float"
+        transition={{ delay: 0.1, type: "spring", stiffness: 160 }}
+        className="w-full max-w-sm overflow-hidden rounded-3xl glass-card shadow-lg"
       >
-        <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-wavelink-teal to-wavelink-blue flex items-center justify-center shadow-lg">
-          <span className="text-5xl">🌊</span>
-        </div>
+        <img
+          src={partnerAsset.url}
+          alt="Wavelink Sustainable Partner Program — one card, zero waste, infinite earnings"
+          loading="lazy"
+          className="w-full h-auto object-cover"
+        />
       </motion.div>
 
       <div className="space-y-3">
